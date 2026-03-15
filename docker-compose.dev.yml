@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (Development)
+  postgres:
+    image: postgres:15-alpine
+    container_name: stellar-analytics-postgres-dev
+    environment:
+      POSTGRES_DB: stellar_analytics_dev
+      POSTGRES_USER: stellar_user
+      POSTGRES_PASSWORD: stellar_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - stellar-dev-network
+    restart: unless-stopped
+
+  # Redis Cache (Development)
+  redis:
+    image: redis:7-alpine
+    container_name: stellar-analytics-redis-dev
+    ports:
+      - "6379:6379"
+    networks:
+      - stellar-dev-network
+    restart: unless-stopped
+
+volumes:
+  postgres_dev_data:
+    driver: local
+
+networks:
+  stellar-dev-network:
+    driver: bridge
