@@ -1,45 +1,37 @@
-import React from 'react'
-import { useQuery } from '@apollo/client'
-import { format } from 'date-fns'
-import { 
-  Activity, 
-  Users, 
-  ArrowRightLeft, 
-  TrendingUp,
-  Clock,
-  DollarSign
-} from 'lucide-react'
+import { useQuery } from '@apollo/client';
+import { format } from 'date-fns';
+import { Users, ArrowRightLeft, TrendingUp, Clock, DollarSign } from 'lucide-react';
 
-import { STATS_QUERY } from '@/graphql/queries'
-import { MetricCard } from '@/components/MetricCard'
-import { NetworkChart } from '@/components/NetworkChart'
-import { RecentTransactions } from '@/components/RecentTransactions'
-import { TopAssets } from '@/components/TopAssets'
+import { STATS_QUERY } from '@/graphql/queries';
+import { MetricCard } from '@/components/MetricCard';
+import { NetworkChart } from '@/components/NetworkChart';
+import { RecentTransactions } from '@/components/RecentTransactions';
+import { TopAssets } from '@/components/TopAssets';
 
 interface StatsData {
   stats: {
-    totalLedgers: number
-    totalTransactions: number
-    totalOperations: number
-    totalAccounts: number
-    totalAssets: number
-    activeAccounts24h: number
-    activeAccounts7d: number
-    activeAccounts30d: number
-    volume24h: string
-    volume7d: string
-    volume30d: string
-    averageFee24h: number
-    successRate24h: number
-    latestLedger: number
-    latestLedgerTime: string
-  }
+    totalLedgers: number;
+    totalTransactions: number;
+    totalOperations: number;
+    totalAccounts: number;
+    totalAssets: number;
+    activeAccounts24h: number;
+    activeAccounts7d: number;
+    activeAccounts30d: number;
+    volume24h: string;
+    volume7d: string;
+    volume30d: string;
+    averageFee24h: number;
+    successRate24h: number;
+    latestLedger: number;
+    latestLedgerTime: string;
+  };
 }
 
 export function Dashboard() {
   const { data, loading, error } = useQuery<StatsData>(STATS_QUERY, {
     pollInterval: 30000, // Refresh every 30 seconds
-  })
+  });
 
   if (loading) {
     return (
@@ -54,7 +46,7 @@ export function Dashboard() {
           <div className="h-96 loading-skeleton" />
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -65,10 +57,10 @@ export function Dashboard() {
         </h2>
         <p className="text-muted-foreground">{error.message}</p>
       </div>
-    )
+    );
   }
 
-  const stats = data?.stats
+  const stats = data?.stats;
 
   const metrics = [
     {
@@ -77,7 +69,7 @@ export function Dashboard() {
       icon: ArrowRightLeft,
       change: stats?.activeAccounts24h || 0,
       changeLabel: '24h active accounts',
-      format: 'number',
+      format: 'number' as const,
     },
     {
       title: 'Total Accounts',
@@ -85,7 +77,7 @@ export function Dashboard() {
       icon: Users,
       change: stats?.activeAccounts24h || 0,
       changeLabel: '24h active',
-      format: 'number',
+      format: 'number' as const,
     },
     {
       title: '24h Volume',
@@ -93,7 +85,7 @@ export function Dashboard() {
       icon: DollarSign,
       change: parseFloat(stats?.volume24h || '0'),
       changeLabel: 'XLM',
-      format: 'currency',
+      format: 'currency' as const,
     },
     {
       title: 'Success Rate',
@@ -101,18 +93,16 @@ export function Dashboard() {
       icon: TrendingUp,
       change: stats?.successRate24h || 0,
       changeLabel: '24h success',
-      format: 'percentage',
+      format: 'percentage' as const,
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-2">
-          Real-time overview of the Stellar network
-        </p>
+        <p className="text-muted-foreground mt-2">Real-time overview of the Stellar network</p>
       </div>
 
       {/* Status Bar */}
@@ -128,9 +118,8 @@ export function Dashboard() {
               Latest Ledger: {stats?.latestLedger}
             </div>
             <div>
-              {stats?.latestLedgerTime && 
-                format(new Date(stats.latestLedgerTime), 'MMM dd, HH:mm:ss')
-              }
+              {stats?.latestLedgerTime &&
+                format(new Date(stats.latestLedgerTime), 'MMM dd, HH:mm:ss')}
             </div>
           </div>
         </div>
@@ -152,5 +141,5 @@ export function Dashboard() {
       {/* Recent Transactions */}
       <RecentTransactions />
     </div>
-  )
+  );
 }

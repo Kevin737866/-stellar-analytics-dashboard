@@ -1,11 +1,11 @@
-import { ApolloClient, InMemoryCache, createHttpLink, split } from '@apollo/client'
-import { getMainDefinition } from '@apollo/client/utilities'
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
-import { createClient } from 'graphql-ws'
+import { ApolloClient, InMemoryCache, createHttpLink, split } from '@apollo/client';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { createClient } from 'graphql-ws';
 
 const httpLink = createHttpLink({
   uri: '/graphql',
-})
+});
 
 const wsLink = new GraphQLWsLink(
   createClient({
@@ -13,20 +13,17 @@ const wsLink = new GraphQLWsLink(
     connectionParams: {
       // Add any authentication headers here if needed
     },
-  }),
-)
+  })
+);
 
 const splitLink = split(
   ({ query }) => {
-    const definition = getMainDefinition(query)
-    return (
-      definition.kind === 'OperationDefinition' &&
-      definition.operation === 'subscription'
-    )
+    const definition = getMainDefinition(query);
+    return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
   },
   wsLink,
-  httpLink,
-)
+  httpLink
+);
 
 export const apolloClient = new ApolloClient({
   link: splitLink,
@@ -38,24 +35,24 @@ export const apolloClient = new ApolloClient({
             merge(existing = { edges: [], pageInfo: {}, totalCount: 0 }, incoming) {
               return {
                 ...incoming,
-                edges: [...incoming.edges],
-              }
+                edges: [...(existing?.edges ?? []), ...incoming.edges],
+              };
             },
           },
           transactions: {
             merge(existing = { edges: [], pageInfo: {}, totalCount: 0 }, incoming) {
               return {
                 ...incoming,
-                edges: [...incoming.edges],
-              }
+                edges: [...(existing?.edges ?? []), ...incoming.edges],
+              };
             },
           },
           operations: {
             merge(existing = { edges: [], pageInfo: {}, totalCount: 0 }, incoming) {
               return {
                 ...incoming,
-                edges: [...incoming.edges],
-              }
+                edges: [...(existing?.edges ?? []), ...incoming.edges],
+              };
             },
           },
         },
@@ -71,4 +68,4 @@ export const apolloClient = new ApolloClient({
       errorPolicy: 'all',
     },
   },
-})
+});

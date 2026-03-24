@@ -1,14 +1,13 @@
-import React from 'react'
-import { LucideIcon } from 'lucide-react'
-import { TrendingUp, TrendingDown } from 'lucide-react'
+import { LucideIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 
 interface MetricCardProps {
-  title: string
-  value: string | number
-  icon: LucideIcon
-  change?: number
-  changeLabel?: string
-  format?: 'number' | 'currency' | 'percentage'
+  title: string;
+  value: string | number;
+  icon: LucideIcon;
+  change?: number;
+  changeLabel?: string;
+  format?: 'number' | 'currency' | 'percentage';
 }
 
 export function MetricCard({
@@ -25,27 +24,27 @@ export function MetricCard({
         return parseFloat(val).toLocaleString(undefined, {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
-        })
+        });
       }
-      return val
+      return val;
     }
 
     if (format === 'currency') {
       return val.toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      })
+      });
     }
 
     if (format === 'percentage') {
-      return val.toString()
+      return val.toString();
     }
 
-    return val.toLocaleString()
-  }
+    return val.toLocaleString();
+  };
 
-  const isPositive = change && change > 0
-  const isNegative = change && change < 0
+  const isPositive = change && change > 0;
+  const isNegative = change && change < 0;
 
   return (
     <div className="metric-card">
@@ -56,24 +55,24 @@ export function MetricCard({
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold text-foreground">
-              {formatValue(value)}
-            </p>
+            <p className="text-2xl font-bold text-foreground">{formatValue(value)}</p>
           </div>
         </div>
       </div>
-      
+
       {change !== undefined && changeLabel && (
         <div className="mt-4 flex items-center gap-2">
           {isPositive && <TrendingUp className="h-4 w-4 text-green-500" />}
           {isNegative && <TrendingDown className="h-4 w-4 text-red-500" />}
-          <span className={`text-sm ${
-            isPositive ? 'text-green-500' : isNegative ? 'text-red-500' : 'text-muted-foreground'
-          }`}>
+          <span
+            className={`text-sm ${
+              isPositive ? 'text-green-500' : isNegative ? 'text-red-500' : 'text-muted-foreground'
+            }`}
+          >
             {changeLabel}
           </span>
         </div>
       )}
     </div>
-  )
+  );
 }
