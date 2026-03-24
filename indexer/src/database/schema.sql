@@ -1,0 +1,31 @@
+CREATE TABLE IF NOT EXISTS blocks (
+  id BIGSERIAL PRIMARY KEY,
+  block_hash TEXT NOT NULL UNIQUE,
+  ledger_sequence BIGINT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+  id BIGSERIAL PRIMARY KEY,
+  tx_hash TEXT NOT NULL UNIQUE,
+  ledger_sequence BIGINT NOT NULL,
+  source_account TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS operations (
+  id BIGSERIAL PRIMARY KEY,
+  operation_id TEXT NOT NULL UNIQUE,
+  tx_hash TEXT NOT NULL,
+  operation_type TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS ledgers (
+  id BIGSERIAL PRIMARY KEY,
+  ledger_sequence BIGINT NOT NULL UNIQUE,
+  ledger_hash TEXT NOT NULL,
+  closed_at TIMESTAMPTZ NOT NULL,
+  tx_count INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
