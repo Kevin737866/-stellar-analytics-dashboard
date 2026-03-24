@@ -1,5 +1,3 @@
-import React from 'react'
-
 export function TopAssets() {
   return (
     <div className="chart-container">
@@ -8,5 +6,5 @@ export function TopAssets() {
         Top assets list coming soon...
       </div>
     </div>
-  )
+  );
 }

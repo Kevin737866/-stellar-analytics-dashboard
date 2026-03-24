@@ -1,5 +1,3 @@
-import React from 'react'
-
 export function RecentTransactions() {
   return (
     <div className="chart-container">
@@ -8,5 +6,5 @@ export function RecentTransactions() {
         Recent transactions list coming soon...
       </div>
     </div>
-  )
+  );
 }

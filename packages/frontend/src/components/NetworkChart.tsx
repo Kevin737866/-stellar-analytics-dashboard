@@ -1,5 +1,3 @@
-import React from 'react'
-
 export function NetworkChart() {
   return (
     <div className="chart-container">
@@ -8,5 +6,5 @@ export function NetworkChart() {
         Network charts coming soon...
       </div>
     </div>
-  )
+  );
 }
