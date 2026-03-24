@@ -1,147 +1,34 @@
-version: '3.8'
-
+version: "3.9"
 services:
-  # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
-    container_name: stellar-analytics-postgres
+    image: postgres:16-alpine
     environment:
       POSTGRES_DB: stellar_analytics
-      POSTGRES_USER: stellar_user
-      POSTGRES_PASSWORD: stellar_password
+      POSTGRES_USER: stellar
+      POSTGRES_PASSWORD: stellar
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./packages/indexer/src/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-    networks:
-      - stellar-network
-    restart: unless-stopped
+      - ./indexer/src/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U stellar_user -d stellar_analytics"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD-SHELL", "pg_isready -U stellar -d stellar_analytics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: stellar-analytics-redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    networks:
-      - stellar-network
-    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Indexer Service
-  indexer:
-    build:
-      context: .
-      dockerfile: packages/indexer/Dockerfile
-    container_name: stellar-analytics-indexer
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://stellar_user:stellar_password@postgres:5432/stellar_analytics
-      REDIS_URL: redis://redis:6379
-      STELLAR_NETWORK: public
-      STELLAR_HORIZON_URL: https://horizon.stellar.org
-      PORT: 3001
-      LOG_LEVEL: info
-    ports:
-      - "3001:3001"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - stellar-network
-    restart: unless-stopped
-    volumes:
-      - indexer_logs:/app/logs
-
-  # GraphQL API Server
-  api:
-    build:
-      context: .
-      dockerfile: packages/api/Dockerfile
-    container_name: stellar-analytics-api
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://stellar_user:stellar_password@postgres:5432/stellar_analytics
-      REDIS_URL: redis://redis:6379
-      PORT: 4000
-      LOG_LEVEL: info
-      CORS_ORIGIN: http://localhost:3000
-    ports:
-      - "4000:4000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - stellar-network
-    restart: unless-stopped
-    volumes:
-      - api_logs:/app/logs
-
-  # Frontend Application
-  frontend:
-    build:
-      context: .
-      dockerfile: packages/frontend/Dockerfile
-    container_name: stellar-analytics-frontend
-    environment:
-      VITE_API_URL: http://localhost:4000/graphql
-      VITE_WS_URL: ws://localhost:4000/graphql
-    ports:
-      - "3000:80"
-    depends_on:
-      - api
-    networks:
-      - stellar-network
-    restart: unless-stopped
-
-  # Nginx Reverse Proxy (Optional)
-  nginx:
-    image: nginx:alpine
-    container_name: stellar-analytics-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - frontend
-      - api
-    networks:
-      - stellar-network
-    restart: unless-stopped
-    profiles:
-      - production
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
-    driver: local
   redis_data:
-    driver: local
-  indexer_logs:
-    driver: local
-  api_logs:
-    driver: local
-
-networks:
-  stellar-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16

@@ -1,0 +1,28 @@
+:root {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #102a43;
+  background: linear-gradient(120deg, #f4f8fb, #ffffff);
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #d9e2ec;
+  border-radius: 12px;
+  padding: 16px;
+}
