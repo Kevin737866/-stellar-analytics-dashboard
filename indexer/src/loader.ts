@@ -1,6 +1,6 @@
-import type { Pool } from "pg";
+import pg from "pg";
 
-export async function writeIngestedData(pool: Pool | null, data: any) {
+export async function writeIngestedData(pool: any, data: any) {
   if (!pool) {
     console.warn("[loader] database pool not configured, skipping write");
     return;
@@ -28,7 +28,7 @@ export async function writeIngestedData(pool: Pool | null, data: any) {
     // 3. Write operations
     for (const op of data.operations) {
       await client.query(
-        "INSERT INTO operations (id, tx_hash, type, source_account, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO NOTHING",
+        "INSERT INTO operations (id, tx_hash, type, source_account, created_at) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (id) DO NOTHING",
         [op.id, op.tx_hash, op.type, op.source_account, op.created_at]
       );
     }
