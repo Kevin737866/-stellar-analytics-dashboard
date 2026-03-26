@@ -5,7 +5,7 @@ interface MetricCardProps {
   title: string;
   value: string | number;
   icon: LucideIcon;
-  change?: number;
+  change?: number | undefined; // Add | undefined here
   changeLabel?: string;
   format?: 'number' | 'currency' | 'percentage';
 }
