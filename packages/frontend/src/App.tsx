@@ -8,6 +8,7 @@ import { Assets } from '@/pages/Assets';
 import { AccountDetail } from '@/pages/AccountDetail';
 import { TransactionDetail } from '@/pages/TransactionDetail';
 import { NotFound } from '@/pages/NotFound';
+import { Ledgers } from './pages/Ledgers';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/accounts/:accountId" element={<AccountDetail />} />
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/transactions/:hash" element={<TransactionDetail />} />
+        <Route path="/ledgers" element={<Ledgers />} />
         <Route path="/assets" element={<Assets />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

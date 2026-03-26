@@ -12,6 +12,7 @@ import {
   Sun,
   Search,
   Bell,
+  Database,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -32,6 +33,7 @@ export function Layout({ children }: LayoutProps) {
     { name: 'Accounts', href: '/accounts', icon: Users },
     { name: 'Transactions', href: '/transactions', icon: ArrowRightLeft },
     { name: 'Assets', href: '/assets', icon: Coins },
+    { name: 'Ledgers', href: '/ledgers', icon: Database },
   ];
 
   React.useEffect(() => {

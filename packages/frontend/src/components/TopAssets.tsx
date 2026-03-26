@@ -5,9 +5,10 @@ import { ASSET_METRICS_QUERY } from '@/graphql/queries';
 export function TopAssets() {
   const { data, loading } = useQuery(ASSET_METRICS_QUERY, {
     variables: { first: 5, timeRange: { last: '24h' } },
+    pollInterval: 30000,
   });
 
-  if (loading) return <div className="h-80 loading-skeleton rounded-lg" />;
+  if (loading) return <div className="h-80 bg-muted/30 animate-pulse rounded-xl" />;
 
   const chartData =
     data?.assetMetrics?.map((m: any) => ({
@@ -16,8 +17,10 @@ export function TopAssets() {
     })) || [];
 
   return (
-    <div className="chart-container">
-      <h3 className="text-lg font-semibold mb-6">Top Assets by 24h Volume</h3>
+    <div className="bg-card p-6 rounded-xl border border-border shadow-sm">
+      <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-6">
+        Market Leaders
+      </h3>
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 30 }}>
@@ -28,18 +31,22 @@ export function TopAssets() {
               axisLine={false}
               tickLine={false}
               width={60}
-              tick={{ fill: 'hsl(var(--foreground))', fontWeight: 500 }}
+              tick={{ fill: 'hsl(var(--foreground))', fontSize: 12, fontWeight: 700 }}
             />
             <Tooltip
-              cursor={{ fill: 'hsl(var(--muted)/0.2)' }}
+              cursor={{ fill: 'hsl(var(--muted)/0.1)' }}
               contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
+                borderRadius: '8px',
               }}
             />
-            <Bar dataKey="volume" radius={[0, 4, 4, 0]} barSize={32}>
-              {chartData.map((_: any, index: number) => (
-                <Cell key={`cell-${index}`} fill={`hsl(var(--primary) / ${1 - index * 0.15})`} />
+            <Bar dataKey="volume" radius={[0, 4, 4, 0]} barSize={24}>
+              {chartData.map((_entry: any, index: number) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={`hsl(var(--primary) / ${Math.max(0.3, 1 - index * 0.15)})`}
+                />
               ))}
             </Bar>
           </BarChart>
