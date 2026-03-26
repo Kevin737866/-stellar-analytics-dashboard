@@ -1,8 +1,10 @@
 import { useQuery } from '@apollo/client';
 import { format } from 'date-fns';
-import { Users, ArrowRightLeft, TrendingUp, Clock, DollarSign } from 'lucide-react';
+import { Users, ArrowRightLeft, TrendingUp, DollarSign } from 'lucide-react';
+import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 
-import { STATS_QUERY } from '@/graphql/queries';
+import { STATS_QUERY, NEW_LEDGER_SUBSCRIPTION } from '@/graphql/queries';
 import { MetricCard } from '@/components/MetricCard';
 import { NetworkChart } from '@/components/NetworkChart';
 import { RecentTransactions } from '@/components/RecentTransactions';
@@ -28,22 +30,54 @@ interface StatsData {
   };
 }
 
+interface LedgerAddedSubscriptionData {
+  ledgerAdded: {
+    sequence: number;
+    closedAt: string;
+    operationCount: number;
+    successfulTransactionCount: number;
+  };
+}
+
 export function Dashboard() {
-  const { data, loading, error } = useQuery<StatsData>(STATS_QUERY, {
-    pollInterval: 30000, // Refresh every 30 seconds
-  });
+  const { data, loading, error, subscribeToMore } = useQuery<StatsData>(STATS_QUERY);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToMore<LedgerAddedSubscriptionData>({
+      document: NEW_LEDGER_SUBSCRIPTION,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+
+        const newLedger = subscriptionData.data.ledgerAdded;
+
+        return {
+          stats: {
+            ...prev.stats,
+            latestLedger: newLedger.sequence,
+            latestLedgerTime: newLedger.closedAt,
+            // Keep total ledgers in sync with the sequence
+            totalLedgers: Math.max(prev.stats.totalLedgers, newLedger.sequence),
+            totalTransactions:
+              prev.stats.totalTransactions + (newLedger.successfulTransactionCount || 0),
+            totalOperations: prev.stats.totalOperations + (newLedger.operationCount || 0),
+          },
+        };
+      },
+    });
+    return () => unsubscribe();
+  }, [subscribeToMore]);
 
   if (loading) {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="h-32 loading-skeleton" />
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-32 bg-muted/50 animate-pulse rounded-xl" />
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="h-96 loading-skeleton" />
-          <div className="h-96 loading-skeleton" />
+          <div className="h-96 bg-muted/50 animate-pulse rounded-xl" />
+          <div className="h-96 bg-muted/50 animate-pulse rounded-xl" />
         </div>
       </div>
     );
@@ -51,10 +85,8 @@ export function Dashboard() {
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-semibold text-destructive mb-2">
-          Error loading dashboard data
-        </h2>
+      <div className="text-center py-12 border border-destructive/20 bg-destructive/5 rounded-xl">
+        <h2 className="text-xl font-bold text-destructive mb-2">Network Sync Error</h2>
         <p className="text-muted-foreground">{error.message}</p>
       </div>
     );
@@ -65,80 +97,82 @@ export function Dashboard() {
   const metrics = [
     {
       title: 'Total Transactions',
-      value: stats?.totalTransactions.toLocaleString() || '0',
+      value: stats?.totalTransactions ?? 0,
       icon: ArrowRightLeft,
-      change: stats?.activeAccounts24h || 0,
-      changeLabel: '24h active accounts',
+      change: stats?.activeAccounts24h,
+      changeLabel: 'Active Accounts (24h)',
       format: 'number' as const,
-    },
-    {
-      title: 'Total Accounts',
-      value: stats?.totalAccounts.toLocaleString() || '0',
-      icon: Users,
-      change: stats?.activeAccounts24h || 0,
-      changeLabel: '24h active',
-      format: 'number' as const,
-    },
-    {
-      title: '24h Volume',
-      value: stats?.volume24h || '0',
-      icon: DollarSign,
-      change: parseFloat(stats?.volume24h || '0'),
-      changeLabel: 'XLM',
-      format: 'currency' as const,
     },
     {
       title: 'Success Rate',
-      value: `${stats?.successRate24h.toFixed(1)}%` || '0%',
+      value: stats?.successRate24h ?? 0,
       icon: TrendingUp,
-      change: stats?.successRate24h || 0,
-      changeLabel: '24h success',
+      change: 0,
+      changeLabel: 'Network Stability',
       format: 'percentage' as const,
+    },
+    {
+      title: '24h Volume',
+      value: stats?.volume24h ?? '0',
+      icon: DollarSign,
+      change: undefined,
+      changeLabel: 'XLM Volume',
+      format: 'currency' as const,
+    },
+    {
+      title: 'Total Accounts',
+      value: stats?.totalAccounts ?? 0,
+      icon: Users,
+      change: stats?.activeAccounts24h,
+      changeLabel: 'New activity detected',
+      format: 'number' as const,
     },
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-2">Real-time overview of the Stellar network</p>
-      </div>
+    <div className="space-y-6 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Network Dashboard</h1>
+          <p className="text-muted-foreground mt-1">Real-time Stellar Protocol monitoring</p>
+        </div>
 
-      {/* Status Bar */}
-      <div className="bg-card rounded-lg border p-4">
-        <div className="flex items-center justify-between">
+        <div className="bg-card px-4 py-2 rounded-lg border border-border shadow-sm flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-sm font-medium">Network Live</span>
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span className="text-xs font-bold uppercase tracking-widest">Live</span>
           </div>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              Latest Ledger: {stats?.latestLedger}
-            </div>
-            <div>
-              {stats?.latestLedgerTime &&
-                format(new Date(stats.latestLedgerTime), 'MMM dd, HH:mm:ss')}
-            </div>
+          <div className="h-4 w-[1px] bg-border" />
+          <div className="flex flex-col items-end">
+            <motion.span
+              key={stats?.latestLedger}
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-sm font-mono font-bold text-primary"
+            >
+              #{stats?.latestLedger}
+            </motion.span>
+            <span className="text-[10px] text-muted-foreground font-medium">
+              {stats?.latestLedgerTime && format(new Date(stats.latestLedgerTime), 'HH:mm:ss')}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {metrics.map((metric, index) => (
           <MetricCard key={index} {...metric} />
         ))}
       </div>
 
-      {/* Charts and Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <NetworkChart />
         <TopAssets />
       </div>
 
-      {/* Recent Transactions */}
       <RecentTransactions />
     </div>
   );

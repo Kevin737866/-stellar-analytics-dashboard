@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client';
 
 export const STATS_QUERY = gql`
   query GetStats {
@@ -20,18 +20,11 @@ export const STATS_QUERY = gql`
       latestLedgerTime
     }
   }
-`
+`;
 
 export const LEDGERS_QUERY = gql`
-  query GetLedgers(
-    $first: Int
-    $after: String
-    $timeRange: TimeRangeInput
-  ) {
-    ledgers(
-      pagination: { first: $first, after: $after }
-      timeRange: $timeRange
-    ) {
+  query GetLedgers($first: Int, $after: String, $timeRange: TimeRangeInput) {
+    ledgers(pagination: { first: $first, after: $after }, timeRange: $timeRange) {
       edges {
         cursor
         node {
@@ -61,7 +54,7 @@ export const LEDGERS_QUERY = gql`
       totalCount
     }
   }
-`
+`;
 
 export const TRANSACTIONS_QUERY = gql`
   query GetTransactions(
@@ -99,7 +92,7 @@ export const TRANSACTIONS_QUERY = gql`
       totalCount
     }
   }
-`
+`;
 
 export const TRANSACTION_QUERY = gql`
   query GetTransaction($hash: String!) {
@@ -129,7 +122,7 @@ export const TRANSACTION_QUERY = gql`
       }
     }
   }
-`
+`;
 
 export const OPERATIONS_QUERY = gql`
   query GetOperations(
@@ -164,18 +157,11 @@ export const OPERATIONS_QUERY = gql`
       totalCount
     }
   }
-`
+`;
 
 export const ACCOUNTS_QUERY = gql`
-  query GetAccounts(
-    $first: Int
-    $after: String
-    $filter: AccountFilterInput
-  ) {
-    accounts(
-      pagination: { first: $first, after: $after }
-      filter: $filter
-    ) {
+  query GetAccounts($first: Int, $after: String, $filter: AccountFilterInput) {
+    accounts(pagination: { first: $first, after: $after }, filter: $filter) {
       edges {
         cursor
         node {
@@ -201,7 +187,7 @@ export const ACCOUNTS_QUERY = gql`
       totalCount
     }
   }
-`
+`;
 
 export const ACCOUNT_QUERY = gql`
   query GetAccount($accountId: String!) {
@@ -230,18 +216,11 @@ export const ACCOUNT_QUERY = gql`
       updatedAt
     }
   }
-`
+`;
 
 export const ASSETS_QUERY = gql`
-  query GetAssets(
-    $first: Int
-    $after: String
-    $filter: AssetFilterInput
-  ) {
-    assets(
-      pagination: { first: $first, after: $after }
-      filter: $filter
-    ) {
+  query GetAssets($first: Int, $after: String, $filter: AssetFilterInput) {
+    assets(pagination: { first: $first, after: $after }, filter: $filter) {
       edges {
         cursor
         node {
@@ -260,7 +239,7 @@ export const ASSETS_QUERY = gql`
       totalCount
     }
   }
-`
+`;
 
 export const NETWORK_METRICS_QUERY = gql`
   query GetNetworkMetrics($timeRange: TimeRangeInput) {
@@ -275,19 +254,11 @@ export const NETWORK_METRICS_QUERY = gql`
       successRate
     }
   }
-`
+`;
 
 export const ASSET_METRICS_QUERY = gql`
-  query GetAssetMetrics(
-    $first: Int
-    $filter: AssetFilterInput
-    $timeRange: TimeRangeInput
-  ) {
-    assetMetrics(
-      pagination: { first: $first }
-      filter: $filter
-      timeRange: $timeRange
-    ) {
+  query GetAssetMetrics($first: Int, $filter: AssetFilterInput, $timeRange: TimeRangeInput) {
+    assetMetrics(pagination: { first: $first }, filter: $filter, timeRange: $timeRange) {
       asset {
         assetType
         assetCode
@@ -305,7 +276,7 @@ export const ASSET_METRICS_QUERY = gql`
       holders
     }
   }
-`
+`;
 
 export const ACCOUNT_METRICS_QUERY = gql`
   query GetAccountMetrics($accountId: String!, $timeRange: TimeRangeInput) {
@@ -323,4 +294,15 @@ export const ACCOUNT_METRICS_QUERY = gql`
       signers
     }
   }
-`
+`;
+
+export const NEW_LEDGER_SUBSCRIPTION = gql`
+  subscription OnNewLedger {
+    ledgerAdded {
+      sequence
+      closedAt
+      operationCount
+      successfulTransactionCount
+    }
+  }
+`;
