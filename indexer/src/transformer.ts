@@ -13,7 +13,7 @@ export function normalizeLedger(data: IngestedData) {
 export function normalizeTransactions(data: IngestedData) {
   return data.transactions.map((tx) => ({
     hash: tx.hash,
-    ledger_seq: tx.ledger_attr,
+    ledger_seq: tx.ledger,
     source_account: tx.source_account,
     fee_charged: tx.fee_charged,
   }));
