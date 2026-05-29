@@ -97,7 +97,7 @@ export function TransactionsList() {
               key={i}
               style={{
                 padding: "12px",
-                background: "#f3f4f6",
+                background: "var(--color-skeleton)",
                 borderRadius: "8px",
                 height: "80px",
               }}
@@ -114,7 +114,7 @@ export function TransactionsList() {
         <h3 style={{ margin: "0 0 8px", fontSize: "16px", fontWeight: 700 }}>
           Transactions
         </h3>
-        <p style={{ margin: 0, fontSize: "13px", color: "#dc2626" }}>
+        <p style={{ margin: 0, fontSize: "13px", color: "var(--color-error)" }}>
           {error.message}
         </p>
       </section>
@@ -128,7 +128,7 @@ export function TransactionsList() {
       </h3>
 
       {transactions.length === 0 ? (
-        <p style={{ margin: 0, fontSize: "13px", color: "#9ca3af" }}>
+        <p style={{ margin: 0, fontSize: "13px", color: "var(--color-text-muted)" }}>
           No transactions available yet. The indexer may still be syncing.
         </p>
       ) : (
@@ -144,29 +144,29 @@ export function TransactionsList() {
               <thead>
                 <tr
                   style={{
-                    borderBottom: "2px solid #e5e7eb",
+                    borderBottom: "2px solid var(--color-border-light)",
                     textAlign: "left",
                   }}
                 >
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Hash
                   </th>
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Status
                   </th>
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Ledger
                   </th>
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Source Account
                   </th>
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Fee
                   </th>
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Operations
                   </th>
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Created At
                   </th>
                 </tr>
@@ -176,7 +176,7 @@ export function TransactionsList() {
                   <tr
                     key={tx.id}
                     style={{
-                      borderBottom: "1px solid #e5e7eb",
+                      borderBottom: "1px solid var(--color-border-light)",
                     }}
                   >
                     <td style={{ padding: "8px", fontFamily: "monospace" }}>
@@ -189,8 +189,8 @@ export function TransactionsList() {
                           borderRadius: "4px",
                           fontSize: "11px",
                           fontWeight: 600,
-                          background: tx.successful ? "#dcfce7" : "#fee2e2",
-                          color: tx.successful ? "#166534" : "#991b1b",
+                          background: tx.successful ? "var(--color-success-bg)" : "var(--color-error-bg)",
+                          color: tx.successful ? "var(--color-success)" : "var(--color-error)",
                         }}
                       >
                         {tx.successful ? "Success" : "Failed"}
@@ -208,7 +208,7 @@ export function TransactionsList() {
                     <td style={{ padding: "8px", fontVariantNumeric: "tabular-nums" }}>
                       {tx.operationCount}
                     </td>
-                    <td style={{ padding: "8px", color: "#6b7280" }}>
+                    <td style={{ padding: "8px", color: "var(--color-text-secondary)" }}>
                       {formatDate(tx.createdAt)}
                     </td>
                   </tr>

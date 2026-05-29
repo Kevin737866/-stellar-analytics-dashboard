@@ -1,7 +1,52 @@
 :root {
   font-family: "Segoe UI", Arial, sans-serif;
-  color: #102a43;
-  background: linear-gradient(120deg, #f4f8fb, #ffffff);
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light theme (default) */
+:root[data-theme="light"] {
+  --color-background: linear-gradient(120deg, #f4f8fb, #ffffff);
+  --color-text-primary: #102a43;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-border: #d9e2ec;
+  --color-border-light: #e5e7eb;
+  --color-card-background: #ffffff;
+  --color-hover: #f3f4f6;
+  --color-error: #dc2626;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fca5a5;
+  --color-warning: #92400e;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fcd34d;
+  --color-success: #166534;
+  --color-success-bg: #dcfce7;
+  --color-primary: #3b82f6;
+  --color-skeleton: #f3f4f6;
+}
+
+/* Dark theme */
+:root[data-theme="dark"] {
+  --color-background: linear-gradient(120deg, #0f172a, #1e293b);
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-border: #334155;
+  --color-border-light: #475569;
+  --color-card-background: #1e293b;
+  --color-hover: #334155;
+  --color-error: #f87171;
+  --color-error-bg: #450a0a;
+  --color-error-border: #7f1d1d;
+  --color-warning: #fbbf24;
+  --color-warning-bg: #451a03;
+  --color-warning-border: #78350f;
+  --color-success: #4ade80;
+  --color-success-bg: #052e16;
+  --color-primary: #60a5fa;
+  --color-skeleton: #334155;
 }
 
 body {
@@ -21,8 +66,33 @@ body {
 }
 
 .card {
-  background: #ffffff;
-  border: 1px solid #d9e2ec;
+  background: var(--color-card-background);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 16px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Skeleton loading animation */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-line {
+  background: var(--color-skeleton);
+  border-radius: 4px;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }

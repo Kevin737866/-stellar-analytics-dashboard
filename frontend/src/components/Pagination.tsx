@@ -90,7 +90,7 @@ export function Pagination({
       <>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <label style={{ fontSize: "13px", color: "#6b7280" }}>
+            <label style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>
               Items per page:
               <select
                 value={pageSize}
@@ -99,7 +99,7 @@ export function Pagination({
                   marginLeft: "8px",
                   padding: "4px 8px",
                   borderRadius: "6px",
-                  border: "1px solid #d1d5db",
+                  border: "1px solid var(--color-border)",
                   fontSize: "13px",
                 }}
               >
@@ -116,8 +116,8 @@ export function Pagination({
             style={{
               padding: "6px 12px",
               borderRadius: "6px",
-              border: "1px solid #d1d5db",
-              background: "#fff",
+              border: "1px solid var(--color-border)",
+              background: "var(--color-card-background)",
               cursor: "pointer",
               fontSize: "13px",
             }}
@@ -135,7 +135,7 @@ export function Pagination({
       {/* Page size and mode toggle */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <label style={{ fontSize: "13px", color: "#6b7280" }}>
+          <label style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>
             Items per page:
             <select
               value={pageSize}
@@ -144,7 +144,7 @@ export function Pagination({
                 marginLeft: "8px",
                 padding: "4px 8px",
                 borderRadius: "6px",
-                border: "1px solid #d1d5db",
+                border: "1px solid var(--color-border)",
                 fontSize: "13px",
               }}
             >
@@ -155,7 +155,7 @@ export function Pagination({
               ))}
             </select>
           </label>
-          <span style={{ fontSize: "13px", color: "#6b7280" }}>
+          <span style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>
             Showing {Math.min(currentPage * pageSize, totalCount)} of {totalCount.toLocaleString()}
           </span>
         </div>
@@ -164,8 +164,8 @@ export function Pagination({
           style={{
             padding: "6px 12px",
             borderRadius: "6px",
-            border: "1px solid #d1d5db",
-            background: "#fff",
+            border: "1px solid var(--color-border)",
+            background: "var(--color-card-background)",
             cursor: "pointer",
             fontSize: "13px",
           }}
@@ -182,11 +182,11 @@ export function Pagination({
           style={{
             padding: "6px 12px",
             borderRadius: "6px",
-            border: currentPage === 1 ? "1px solid #e5e7eb" : "1px solid #d1d5db",
-            background: currentPage === 1 ? "#f9fafb" : "#fff",
+            border: currentPage === 1 ? "1px solid var(--color-border-light)" : "1px solid var(--color-border)",
+            background: currentPage === 1 ? "var(--color-hover)" : "var(--color-card-background)",
             cursor: currentPage === 1 ? "not-allowed" : "pointer",
             fontSize: "13px",
-            color: currentPage === 1 ? "#9ca3af" : "#374151",
+            color: currentPage === 1 ? "var(--color-text-muted)" : "var(--color-text-primary)",
           }}
         >
           Previous
@@ -220,11 +220,11 @@ export function Pagination({
                 style={{
                   padding: "6px 10px",
                   borderRadius: "6px",
-                  border: pageNum === currentPage ? "1px solid #3b82f6" : "1px solid #d1d5db",
-                  background: pageNum === currentPage ? "#3b82f6" : "#fff",
+                  border: pageNum === currentPage ? "1px solid var(--color-primary)" : "1px solid var(--color-border)",
+                  background: pageNum === currentPage ? "var(--color-primary)" : "var(--color-card-background)",
                   cursor: pageNum === currentPage ? "default" : "pointer",
                   fontSize: "13px",
-                  color: pageNum === currentPage ? "#fff" : "#374151",
+                  color: pageNum === currentPage ? "#fff" : "var(--color-text-primary)",
                   minWidth: "32px",
                 }}
               >
@@ -240,11 +240,11 @@ export function Pagination({
           style={{
             padding: "6px 12px",
             borderRadius: "6px",
-            border: !pageInfo.hasNextPage ? "1px solid #e5e7eb" : "1px solid #d1d5db",
-            background: !pageInfo.hasNextPage ? "#f9fafb" : "#fff",
+            border: !pageInfo.hasNextPage ? "1px solid var(--color-border-light)" : "1px solid var(--color-border)",
+            background: !pageInfo.hasNextPage ? "var(--color-hover)" : "var(--color-card-background)",
             cursor: !pageInfo.hasNextPage ? "not-allowed" : "pointer",
             fontSize: "13px",
-            color: !pageInfo.hasNextPage ? "#9ca3af" : "#374151",
+            color: !pageInfo.hasNextPage ? "var(--color-text-muted)" : "var(--color-text-primary)",
           }}
         >
           Next

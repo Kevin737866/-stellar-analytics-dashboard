@@ -84,7 +84,7 @@ export function LedgersList() {
               key={i}
               style={{
                 padding: "12px",
-                background: "#f3f4f6",
+                background: "var(--color-skeleton)",
                 borderRadius: "8px",
                 height: "80px",
               }}
@@ -101,7 +101,7 @@ export function LedgersList() {
         <h3 style={{ margin: "0 0 8px", fontSize: "16px", fontWeight: 700 }}>
           Ledgers
         </h3>
-        <p style={{ margin: 0, fontSize: "13px", color: "#dc2626" }}>
+        <p style={{ margin: 0, fontSize: "13px", color: "var(--color-error)" }}>
           {error.message}
         </p>
       </section>
@@ -115,7 +115,7 @@ export function LedgersList() {
       </h3>
 
       {ledgers.length === 0 ? (
-        <p style={{ margin: 0, fontSize: "13px", color: "#9ca3af" }}>
+        <p style={{ margin: 0, fontSize: "13px", color: "var(--color-text-muted)" }}>
           No ledgers available yet. The indexer may still be syncing.
         </p>
       ) : (
@@ -131,23 +131,23 @@ export function LedgersList() {
               <thead>
                 <tr
                   style={{
-                    borderBottom: "2px solid #e5e7eb",
+                    borderBottom: "2px solid var(--color-border-light)",
                     textAlign: "left",
                   }}
                 >
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Sequence
                   </th>
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Successful Tx
                   </th>
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Failed Tx
                   </th>
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Operations
                   </th>
-                  <th style={{ padding: "8px", fontWeight: 600, color: "#6b7280" }}>
+                  <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
                     Closed At
                   </th>
                 </tr>
@@ -157,7 +157,7 @@ export function LedgersList() {
                   <tr
                     key={ledger.id}
                     style={{
-                      borderBottom: "1px solid #e5e7eb",
+                      borderBottom: "1px solid var(--color-border-light)",
                     }}
                   >
                     <td style={{ padding: "8px", fontVariantNumeric: "tabular-nums" }}>
@@ -172,7 +172,7 @@ export function LedgersList() {
                     <td style={{ padding: "8px", fontVariantNumeric: "tabular-nums" }}>
                       {ledger.operationCount.toLocaleString()}
                     </td>
-                    <td style={{ padding: "8px", color: "#6b7280" }}>
+                    <td style={{ padding: "8px", color: "var(--color-text-secondary)" }}>
                       {formatDate(ledger.closedAt)}
                     </td>
                   </tr>
