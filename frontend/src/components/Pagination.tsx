@@ -8,6 +8,8 @@
  * - Reusable for any cursor-based paginated data
  */
 import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocaleFormat } from "../utils/localeUtils";
 
 export interface PageInfo {
   hasNextPage: boolean;
@@ -48,6 +50,8 @@ export function Pagination({
   currentCursor,
   previousCursors,
 }: PaginationProps) {
+  const { t } = useTranslation();
+  const { formatNumber } = useLocaleFormat();
   const [isInfiniteScroll, setIsInfiniteScroll] = useState(enableInfiniteScroll);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -91,7 +95,7 @@ export function Pagination({
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <label style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>
-              Items per page:
+              {t('pagination.rowsPerPage')}:
               <select
                 value={pageSize}
                 onChange={(e) => onPageSizeChange(Number(e.target.value))}
@@ -136,7 +140,7 @@ export function Pagination({
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <label style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>
-            Items per page:
+            {t('pagination.rowsPerPage')}:
             <select
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
@@ -156,7 +160,7 @@ export function Pagination({
             </select>
           </label>
           <span style={{ fontSize: "13px", color: "var(--color-text-secondary)" }}>
-            Showing {Math.min(currentPage * pageSize, totalCount)} of {totalCount.toLocaleString()}
+            {Math.min(currentPage * pageSize, totalCount)} {t('pagination.of')} {formatNumber(totalCount)}
           </span>
         </div>
         <button
@@ -189,7 +193,7 @@ export function Pagination({
             color: currentPage === 1 ? "var(--color-text-muted)" : "var(--color-text-primary)",
           }}
         >
-          Previous
+          {t('pagination.previous')}
         </button>
 
         {/* Page numbers */}
@@ -247,7 +251,7 @@ export function Pagination({
             color: !pageInfo.hasNextPage ? "var(--color-text-muted)" : "var(--color-text-primary)",
           }}
         >
-          Next
+          {t('pagination.next')}
         </button>
       </div>
     </div>

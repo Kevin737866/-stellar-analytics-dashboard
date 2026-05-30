@@ -1,5 +1,6 @@
 :root {
   font-family: "Segoe UI", Arial, sans-serif;
+<<<<<<< HEAD
   color: var(--color-text-primary);
   background: var(--color-background);
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -47,10 +48,72 @@
   --color-success-bg: #052e16;
   --color-primary: #60a5fa;
   --color-skeleton: #334155;
+=======
+  
+  /* Light theme variables */
+  --color-text-primary: #102a43;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+  --color-text-disabled: #d1d5db;
+  --color-background: linear-gradient(120deg, #f4f8fb, #ffffff);
+  --color-card-background: #ffffff;
+  --color-card-border: #d9e2ec;
+  --color-border: #d1d5db;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-light: #93c5fd;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fca5a5;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fcd34d;
+  --color-warning-text: #92400e;
+  --color-input-bg: #ffffff;
+  --color-input-disabled: #f3f4f6;
+  --color-skeleton-start: #f3f4f6;
+  --color-skeleton-end: #e5e7eb;
+  --color-progress-bg: #e5e7eb;
+  
+  /* Transition */
+  --transition-speed: 0.3s;
+}
+
+[data-theme="dark"] {
+  /* Dark theme variables */
+  --color-text-primary: #f0f4f8;
+  --color-text-secondary: #9ca3af;
+  --color-text-tertiary: #6b7280;
+  --color-text-disabled: #4b5563;
+  --color-background: linear-gradient(120deg, #0f172a, #1e293b);
+  --color-card-background: #1e293b;
+  --color-card-border: #334155;
+  --color-border: #475569;
+  --color-primary: #60a5fa;
+  --color-primary-hover: #3b82f6;
+  --color-primary-light: #1e40af;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-error-bg: #450a0a;
+  --color-error-border: #7f1d1d;
+  --color-warning-bg: #451a03;
+  --color-warning-border: #7c2d12;
+  --color-warning-text: #fcd34d;
+  --color-input-bg: #1e293b;
+  --color-input-disabled: #0f172a;
+  --color-skeleton-start: #1e293b;
+  --color-skeleton-end: #334155;
+  --color-progress-bg: #334155;
+>>>>>>> 2e4ca07 (feat: implement dark mode with theme toggle and persistence)
 }
 
 body {
   margin: 0;
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  transition: background var(--transition-speed) ease, color var(--transition-speed) ease;
 }
 
 .app {
@@ -67,6 +130,7 @@ body {
 
 .card {
   background: var(--color-card-background);
+<<<<<<< HEAD
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 16px;
@@ -95,4 +159,10 @@ body {
   100% {
     opacity: 0.6;
   }
+=======
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  padding: 16px;
+  transition: background var(--transition-speed) ease, border-color var(--transition-speed) ease;
+>>>>>>> 2e4ca07 (feat: implement dark mode with theme toggle and persistence)
 }

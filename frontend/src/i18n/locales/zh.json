@@ -1,0 +1,74 @@
+{
+  "app": {
+    "title": "Stellar 分析仪表板",
+    "network": "网络",
+    "latestLedger": "最新账本",
+    "refreshing": "刷新中…"
+  },
+  "tabs": {
+    "dashboard": "仪表板",
+    "ledgers": "账本",
+    "transactions": "交易"
+  },
+  "metrics": {
+    "totalLedgers": "账本总数",
+    "totalTransactions": "交易总数",
+    "totalOperations": "操作总数",
+    "totalAccounts": "账户总数",
+    "activeAccounts24h": "活跃账户（24小时）",
+    "volume24h": "交易量（24小时）",
+    "avgFee24h": "平均费用（24小时）",
+    "successRate24h": "成功率（24小时）"
+  },
+  "errors": {
+    "failedToLoad": "加载仪表板数据失败",
+    "couldNotRefresh": "无法刷新数据",
+    "retry": "重试"
+  },
+  "ledgers": {
+    "title": "账本",
+    "noLedgers": "暂无账本数据。索引器可能仍在同步中。",
+    "sequence": "序列号",
+    "successfulTx": "成功交易",
+    "failedTx": "失败交易",
+    "operations": "操作",
+    "closedAt": "关闭时间"
+  },
+  "transactions": {
+    "title": "交易",
+    "noTransactions": "暂无交易数据。索引器可能仍在同步中。",
+    "hash": "哈希",
+    "status": "状态",
+    "ledger": "账本",
+    "sourceAccount": "源账户",
+    "fee": "费用",
+    "operations": "操作",
+    "createdAt": "创建时间",
+    "success": "成功",
+    "failed": "失败"
+  },
+  "pagination": {
+    "rowsPerPage": "每页行数",
+    "of": "/",
+    "previous": "上一页",
+    "next": "下一页"
+  },
+  "theme": {
+    "switchToDark": "切换到深色模式",
+    "switchToLight": "切换到浅色模式"
+  },
+  "language": {
+    "select": "选择语言",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "japanese": "日本語",
+    "chinese": "中文"
+  },
+  "export": {
+    "export": "导出",
+    "csv": "导出为 CSV",
+    "json": "导出为 JSON"
+  }
+}

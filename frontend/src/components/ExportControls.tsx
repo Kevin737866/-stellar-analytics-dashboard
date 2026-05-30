@@ -65,7 +65,7 @@ export function ExportControls({ data, baseFilename, disabled = false }: ExportC
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
       {/* Format selection */}
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <label style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>
+      <label style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 500 }}>
         Format:
       </label>
       <select
@@ -75,10 +75,11 @@ export function ExportControls({ data, baseFilename, disabled = false }: ExportC
         style={{
           padding: '6px 10px',
           borderRadius: '6px',
-          border: '1px solid #d1d5db',
+          border: '1px solid var(--color-border)',
           fontSize: '13px',
           cursor: isExporting || disabled ? 'not-allowed' : 'pointer',
-          background: isExporting || disabled ? '#f3f4f6' : '#fff',
+          background: isExporting || disabled ? 'var(--color-input-disabled)' : 'var(--color-input-bg)',
+          color: 'var(--color-text-primary)',
         }}
       >
         <option value="csv">CSV</option>
@@ -88,7 +89,7 @@ export function ExportControls({ data, baseFilename, disabled = false }: ExportC
 
       {/* Date range selection */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <label style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>
+        <label style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 500 }}>
           From:
         </label>
         <input
@@ -99,12 +100,14 @@ export function ExportControls({ data, baseFilename, disabled = false }: ExportC
           style={{
             padding: '6px 10px',
             borderRadius: '6px',
-            border: '1px solid #d1d5db',
+            border: '1px solid var(--color-border)',
             fontSize: '13px',
             cursor: isExporting || disabled ? 'not-allowed' : 'pointer',
+            background: 'var(--color-input-bg)',
+            color: 'var(--color-text-primary)',
           }}
         />
-        <label style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>
+        <label style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 500 }}>
           To:
         </label>
         <input
@@ -115,9 +118,11 @@ export function ExportControls({ data, baseFilename, disabled = false }: ExportC
           style={{
             padding: '6px 10px',
             borderRadius: '6px',
-            border: '1px solid #d1d5db',
+            border: '1px solid var(--color-border)',
             fontSize: '13px',
             cursor: isExporting || disabled ? 'not-allowed' : 'pointer',
+            background: 'var(--color-input-bg)',
+            color: 'var(--color-text-primary)',
           }}
         />
       </div>
@@ -129,8 +134,8 @@ export function ExportControls({ data, baseFilename, disabled = false }: ExportC
         style={{
           padding: '6px 16px',
           borderRadius: '6px',
-          border: '1px solid #3b82f6',
-          background: isExporting ? '#93c5fd' : '#3b82f6',
+          border: '1px solid var(--color-primary)',
+          background: isExporting ? 'var(--color-primary-light)' : 'var(--color-primary)',
           color: '#fff',
           fontSize: '13px',
           fontWeight: 500,
@@ -156,7 +161,7 @@ export function ExportControls({ data, baseFilename, disabled = false }: ExportC
           style={{
             width: '100px',
             height: '6px',
-            background: '#e5e7eb',
+            background: 'var(--color-progress-bg)',
             borderRadius: '3px',
             overflow: 'hidden',
           }}
@@ -165,7 +170,7 @@ export function ExportControls({ data, baseFilename, disabled = false }: ExportC
             style={{
               width: `${exportProgress}%`,
               height: '100%',
-              background: '#3b82f6',
+              background: 'var(--color-primary)',
               transition: 'width 0.3s ease',
             }}
           />

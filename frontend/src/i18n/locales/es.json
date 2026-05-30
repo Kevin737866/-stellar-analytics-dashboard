@@ -1,0 +1,74 @@
+{
+  "app": {
+    "title": "Panel de Análisis Stellar",
+    "network": "Red",
+    "latestLedger": "Último ledger",
+    "refreshing": "Actualizando…"
+  },
+  "tabs": {
+    "dashboard": "Panel",
+    "ledgers": "Ledgers",
+    "transactions": "Transacciones"
+  },
+  "metrics": {
+    "totalLedgers": "Total de Ledgers",
+    "totalTransactions": "Total de Transacciones",
+    "totalOperations": "Total de Operaciones",
+    "totalAccounts": "Total de Cuentas",
+    "activeAccounts24h": "Cuentas Activas (24h)",
+    "volume24h": "Volumen (24h)",
+    "avgFee24h": "Tarifa Promedio (24h)",
+    "successRate24h": "Tasa de Éxito (24h)"
+  },
+  "errors": {
+    "failedToLoad": "Error al cargar datos del panel",
+    "couldNotRefresh": "No se pudieron actualizar los datos",
+    "retry": "Reintentar"
+  },
+  "ledgers": {
+    "title": "Ledgers",
+    "noLedgers": "No hay ledgers disponibles aún. El indexador puede estar sincronizándose.",
+    "sequence": "Secuencia",
+    "successfulTx": "Transacciones Exitosas",
+    "failedTx": "Transacciones Fallidas",
+    "operations": "Operaciones",
+    "closedAt": "Cerrado En"
+  },
+  "transactions": {
+    "title": "Transacciones",
+    "noTransactions": "No hay transacciones disponibles aún. El indexador puede estar sincronizándose.",
+    "hash": "Hash",
+    "status": "Estado",
+    "ledger": "Ledger",
+    "sourceAccount": "Cuenta Origen",
+    "fee": "Tarifa",
+    "operations": "Operaciones",
+    "createdAt": "Creado En",
+    "success": "Éxito",
+    "failed": "Fallido"
+  },
+  "pagination": {
+    "rowsPerPage": "Filas por página",
+    "of": "de",
+    "previous": "Anterior",
+    "next": "Siguiente"
+  },
+  "theme": {
+    "switchToDark": "Cambiar a modo oscuro",
+    "switchToLight": "Cambiar a modo claro"
+  },
+  "language": {
+    "select": "Seleccionar Idioma",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "japanese": "日本語",
+    "chinese": "中文"
+  },
+  "export": {
+    "export": "Exportar",
+    "csv": "Exportar como CSV",
+    "json": "Exportar como JSON"
+  }
+}

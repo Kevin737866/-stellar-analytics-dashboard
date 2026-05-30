@@ -1,0 +1,74 @@
+{
+  "app": {
+    "title": "Tableau de Bord Stellar Analytics",
+    "network": "Réseau",
+    "latestLedger": "Dernier ledger",
+    "refreshing": "Actualisation…"
+  },
+  "tabs": {
+    "dashboard": "Tableau de bord",
+    "ledgers": "Ledgers",
+    "transactions": "Transactions"
+  },
+  "metrics": {
+    "totalLedgers": "Total des Ledgers",
+    "totalTransactions": "Total des Transactions",
+    "totalOperations": "Total des Opérations",
+    "totalAccounts": "Total des Comptes",
+    "activeAccounts24h": "Comptes Actifs (24h)",
+    "volume24h": "Volume (24h)",
+    "avgFee24h": "Frais Moyens (24h)",
+    "successRate24h": "Taux de Succès (24h)"
+  },
+  "errors": {
+    "failedToLoad": "Échec du chargement des données du tableau de bord",
+    "couldNotRefresh": "Impossible d'actualiser les données",
+    "retry": "Réessayer"
+  },
+  "ledgers": {
+    "title": "Ledgers",
+    "noLedgers": "Aucun ledger disponible pour le moment. L'indexeur peut encore être en synchronisation.",
+    "sequence": "Séquence",
+    "successfulTx": "Transactions Réussies",
+    "failedTx": "Transactions Échouées",
+    "operations": "Opérations",
+    "closedAt": "Fermé À"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "noTransactions": "Aucune transaction disponible pour le moment. L'indexeur peut encore être en synchronisation.",
+    "hash": "Hash",
+    "status": "Statut",
+    "ledger": "Ledger",
+    "sourceAccount": "Compte Source",
+    "fee": "Frais",
+    "operations": "Opérations",
+    "createdAt": "Créé À",
+    "success": "Succès",
+    "failed": "Échec"
+  },
+  "pagination": {
+    "rowsPerPage": "Lignes par page",
+    "of": "sur",
+    "previous": "Précédent",
+    "next": "Suivant"
+  },
+  "theme": {
+    "switchToDark": "Passer en mode sombre",
+    "switchToLight": "Passer en mode clair"
+  },
+  "language": {
+    "select": "Sélectionner la langue",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "japanese": "日本語",
+    "chinese": "中文"
+  },
+  "export": {
+    "export": "Exporter",
+    "csv": "Exporter en CSV",
+    "json": "Exporter en JSON"
+  }
+}

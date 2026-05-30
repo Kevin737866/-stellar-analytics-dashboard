@@ -7,10 +7,18 @@
  */
 import { TransactionsChart } from "../components/TransactionsChart";
 import { ExportControls } from "../components/ExportControls";
+import { ThemeToggle } from "../components/ThemeToggle";
 import { useDashboardData } from "../hooks/useDashboardData";
 import { statsToArray } from "../utils/exportUtils";
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { LedgersList } from "../components/LedgersList";
+import { TransactionsList } from "../components/TransactionsList";
+import { useLocaleFormat } from "../utils/localeUtils";
 
 export function DashboardPage() {
+  const { t } = useTranslation();
+  const { formatNumber } = useLocaleFormat();
   const { data, loading, error, retry } = useDashboardData();
   const [activeTab, setActiveTab] = useState<"dashboard" | "ledgers" | "transactions">("dashboard");
 
@@ -18,7 +26,7 @@ export function DashboardPage() {
   if (loading && !data) {
     return (
       <main className="app">
-        <h1>Stellar Analytics Dashboard</h1>
+        <h1>{t('app.title')}</h1>
         <div className="grid">
           {[0, 1, 2, 3].map((i) => (
             <article key={i} className="card skeleton" aria-busy="true">
@@ -35,7 +43,7 @@ export function DashboardPage() {
   if (error && !data) {
     return (
       <main className="app">
-        <h1>Stellar Analytics Dashboard</h1>
+        <h1>{t('app.title')}</h1>
         <div
           role="alert"
           style={{
@@ -47,7 +55,7 @@ export function DashboardPage() {
           }}
         >
           <h2 style={{ margin: "0 0 8px", color: "var(--color-error)", fontSize: "16px" }}>
-            Failed to load dashboard data
+            {t('errors.failedToLoad')}
           </h2>
           <p style={{ margin: "0 0 12px", color: "var(--color-text-secondary)", fontSize: "14px" }}>
             {error.message}
@@ -64,7 +72,7 @@ export function DashboardPage() {
               fontSize: "14px",
             }}
           >
-            Retry
+            {t('errors.retry')}
           </button>
         </div>
       </main>
@@ -75,31 +83,34 @@ export function DashboardPage() {
   const stats = data!;
 
   const metrics = [
-    { label: "Total Ledgers", value: stats.totalLedgers.toLocaleString() },
-    { label: "Total Transactions", value: stats.totalTransactions.toLocaleString() },
-    { label: "Total Operations", value: stats.totalOperations.toLocaleString() },
-    { label: "Total Accounts", value: stats.totalAccounts.toLocaleString() },
-    { label: "Active Accounts (24h)", value: stats.activeAccounts24h.toLocaleString() },
-    { label: "Volume (24h)", value: stats.volume24h },
-    { label: "Avg Fee (24h)", value: `${stats.averageFee24h.toFixed(0)} str` },
-    { label: "Success Rate (24h)", value: `${stats.successRate24h.toFixed(1)}%` },
+    { label: t('metrics.totalLedgers'), value: formatNumber(stats.totalLedgers) },
+    { label: t('metrics.totalTransactions'), value: formatNumber(stats.totalTransactions) },
+    { label: t('metrics.totalOperations'), value: formatNumber(stats.totalOperations) },
+    { label: t('metrics.totalAccounts'), value: formatNumber(stats.totalAccounts) },
+    { label: t('metrics.activeAccounts24h'), value: formatNumber(stats.activeAccounts24h) },
+    { label: t('metrics.volume24h'), value: stats.volume24h },
+    { label: t('metrics.avgFee24h'), value: `${formatNumber(stats.averageFee24h, { maximumFractionDigits: 0 })} str` },
+    { label: t('metrics.successRate24h'), value: `${formatNumber(stats.successRate24h, { maximumFractionDigits: 1 })}%` },
   ];
 
   return (
     <main className="app">
       <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <div>
-          <h1 style={{ margin: 0 }}>Stellar Analytics Dashboard</h1>
+          <h1 style={{ margin: 0 }}>{t('app.title')}</h1>
           <p style={{ margin: "4px 0 0", color: "var(--color-text-secondary)", fontSize: "14px" }}>
-            Network:{" "}
+            {t('app.network')}:{" "}
             <strong style={{ textTransform: "capitalize" }}>{stats.network}</strong>
             {stats.latestLedger !== null && (
-              <> &nbsp;·&nbsp; Latest ledger: <strong>#{stats.latestLedger}</strong></>
+              <> &nbsp;·&nbsp; {t('app.latestLedger')}: <strong>#{stats.latestLedger}</strong></>
             )}
           </p>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {/* Theme toggle */}
+          <ThemeToggle />
+          
           {/* Export controls for dashboard metrics */}
           <ExportControls 
             data={statsToArray(stats)} 
@@ -111,9 +122,9 @@ export function DashboardPage() {
           {loading && (
             <span
               aria-label="Refreshing data"
-              style={{ fontSize: "12px", color: "#9ca3af" }}
+              style={{ fontSize: "12px", color: "var(--color-text-tertiary)" }}
             >
-              ↻ Refreshing…
+              ↻ {t('app.refreshing')}
             </span>
           )}
         </div>
@@ -135,7 +146,7 @@ export function DashboardPage() {
               color: activeTab === "dashboard" ? "var(--color-primary)" : "var(--color-text-secondary)",
             }}
           >
-            Dashboard
+            {t('tabs.dashboard')}
           </button>
           <button
             onClick={() => setActiveTab("ledgers")}
@@ -150,7 +161,7 @@ export function DashboardPage() {
               color: activeTab === "ledgers" ? "var(--color-primary)" : "var(--color-text-secondary)",
             }}
           >
-            Ledgers
+            {t('tabs.ledgers')}
           </button>
           <button
             onClick={() => setActiveTab("transactions")}
@@ -165,7 +176,7 @@ export function DashboardPage() {
               color: activeTab === "transactions" ? "var(--color-primary)" : "var(--color-text-secondary)",
             }}
           >
-            Transactions
+            {t('tabs.transactions')}
           </button>
         </div>
       </div>
@@ -186,8 +197,8 @@ export function DashboardPage() {
             fontSize: "13px",
           }}
         >
-          <span style={{ color: "var(--color-warning)" }}>
-            Could not refresh data: {error.message}
+          <span style={{ color: "var(--color-warning-text)" }}>
+            {t('errors.couldNotRefresh')}: {error.message}
           </span>
           <button
             onClick={retry}
@@ -197,11 +208,11 @@ export function DashboardPage() {
               borderRadius: "6px",
               padding: "4px 10px",
               cursor: "pointer",
-              color: "var(--color-warning)",
+              color: "var(--color-warning-text)",
               fontSize: "12px",
             }}
           >
-            Retry
+            {t('errors.retry')}
           </button>
         </div>
       )}

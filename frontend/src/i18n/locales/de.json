@@ -1,0 +1,74 @@
+{
+  "app": {
+    "title": "Stellar Analytics Dashboard",
+    "network": "Netzwerk",
+    "latestLedger": "Letztes Ledger",
+    "refreshing": "Aktualisiere…"
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "ledgers": "Ledgers",
+    "transactions": "Transaktionen"
+  },
+  "metrics": {
+    "totalLedgers": "Gesamtzahl der Ledgers",
+    "totalTransactions": "Gesamtzahl der Transaktionen",
+    "totalOperations": "Gesamtzahl der Operationen",
+    "totalAccounts": "Gesamtzahl der Konten",
+    "activeAccounts24h": "Aktive Konten (24h)",
+    "volume24h": "Volumen (24h)",
+    "avgFee24h": "Durchschnittliche Gebühr (24h)",
+    "successRate24h": "Erfolgsrate (24h)"
+  },
+  "errors": {
+    "failedToLoad": "Fehler beim Laden der Dashboard-Daten",
+    "couldNotRefresh": "Daten konnten nicht aktualisiert werden",
+    "retry": "Wiederholen"
+  },
+  "ledgers": {
+    "title": "Ledgers",
+    "noLedgers": "Noch keine Ledgers verfügbar. Der Indexer wird möglicherweise noch synchronisiert.",
+    "sequence": "Sequenz",
+    "successfulTx": "Erfolgreiche Transaktionen",
+    "failedTx": "Fehlgeschlagene Transaktionen",
+    "operations": "Operationen",
+    "closedAt": "Geschlossen Am"
+  },
+  "transactions": {
+    "title": "Transaktionen",
+    "noTransactions": "Noch keine Transaktionen verfügbar. Der Indexer wird möglicherweise noch synchronisiert.",
+    "hash": "Hash",
+    "status": "Status",
+    "ledger": "Ledger",
+    "sourceAccount": "Quellkonto",
+    "fee": "Gebühr",
+    "operations": "Operationen",
+    "createdAt": "Erstellt Am",
+    "success": "Erfolg",
+    "failed": "Fehlgeschlagen"
+  },
+  "pagination": {
+    "rowsPerPage": "Zeilen pro Seite",
+    "of": "von",
+    "previous": "Zurück",
+    "next": "Weiter"
+  },
+  "theme": {
+    "switchToDark": "Zum Dunkelmodus wechseln",
+    "switchToLight": "Zum Hellmodus wechseln"
+  },
+  "language": {
+    "select": "Sprache auswählen",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "japanese": "日本語",
+    "chinese": "中文"
+  },
+  "export": {
+    "export": "Exportieren",
+    "csv": "Als CSV exportieren",
+    "json": "Als JSON exportieren"
+  }
+}

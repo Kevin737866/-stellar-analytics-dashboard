@@ -8,6 +8,8 @@ import { useQuery } from "@apollo/client";
 import { TRANSACTIONS_QUERY } from "../graphql/queries";
 import { Pagination, PageInfo } from "./Pagination";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocaleFormat } from "../utils/localeUtils";
 
 interface TransactionEdge {
   cursor: string;
@@ -32,6 +34,8 @@ interface TransactionsData {
 }
 
 export function TransactionsList() {
+  const { t } = useTranslation();
+  const { formatDate, formatNumber } = useLocaleFormat();
   const [pageSize, setPageSize] = useState(25);
   const [after, setAfter] = useState<string | null>(null);
   const [previousCursors, setPreviousCursors] = useState<string[]>([]);
@@ -72,11 +76,6 @@ export function TransactionsList() {
     }
   };
 
-  const formatDate = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleString();
-  };
-
   const formatHash = (hash: string) => {
     return `${hash.slice(0, 8)}...${hash.slice(-8)}`;
   };
@@ -89,7 +88,7 @@ export function TransactionsList() {
     return (
       <section className="card" aria-busy="true">
         <h3 style={{ margin: "0 0 16px", fontSize: "16px", fontWeight: 700 }}>
-          Transactions
+          {t('transactions.title')}
         </h3>
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {[0, 1, 2, 3, 4].map((i) => (
@@ -112,7 +111,7 @@ export function TransactionsList() {
     return (
       <section className="card" role="alert">
         <h3 style={{ margin: "0 0 8px", fontSize: "16px", fontWeight: 700 }}>
-          Transactions
+          {t('transactions.title')}
         </h3>
         <p style={{ margin: 0, fontSize: "13px", color: "var(--color-error)" }}>
           {error.message}
@@ -124,12 +123,12 @@ export function TransactionsList() {
   return (
     <section className="card">
       <h3 style={{ margin: "0 0 16px", fontSize: "16px", fontWeight: 700 }}>
-        Transactions
+        {t('transactions.title')}
       </h3>
 
       {transactions.length === 0 ? (
         <p style={{ margin: 0, fontSize: "13px", color: "var(--color-text-muted)" }}>
-          No transactions available yet. The indexer may still be syncing.
+          {t('transactions.noTransactions')}
         </p>
       ) : (
         <>
@@ -149,25 +148,25 @@ export function TransactionsList() {
                   }}
                 >
                   <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
-                    Hash
+                    {t('transactions.hash')}
                   </th>
                   <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
-                    Status
+                    {t('transactions.status')}
                   </th>
                   <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
-                    Ledger
+                    {t('transactions.ledger')}
                   </th>
                   <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
-                    Source Account
+                    {t('transactions.sourceAccount')}
                   </th>
                   <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
-                    Fee
+                    {t('transactions.fee')}
                   </th>
                   <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
-                    Operations
+                    {t('transactions.operations')}
                   </th>
                   <th style={{ padding: "8px", fontWeight: 600, color: "var(--color-text-secondary)" }}>
-                    Created At
+                    {t('transactions.createdAt')}
                   </th>
                 </tr>
               </thead>
@@ -193,7 +192,7 @@ export function TransactionsList() {
                           color: tx.successful ? "var(--color-success)" : "var(--color-error)",
                         }}
                       >
-                        {tx.successful ? "Success" : "Failed"}
+                        {tx.successful ? t('transactions.success') : t('transactions.failed')}
                       </span>
                     </td>
                     <td style={{ padding: "8px", fontVariantNumeric: "tabular-nums" }}>
@@ -203,7 +202,7 @@ export function TransactionsList() {
                       {formatAccount(tx.sourceAccount)}
                     </td>
                     <td style={{ padding: "8px", fontVariantNumeric: "tabular-nums" }}>
-                      {tx.feeCharged.toLocaleString()} str
+                      {formatNumber(tx.feeCharged)} str
                     </td>
                     <td style={{ padding: "8px", fontVariantNumeric: "tabular-nums" }}>
                       {tx.operationCount}

@@ -51,7 +51,7 @@ export function TransactionsChart() {
         <div
           style={{
             height: "120px",
-            background: "linear-gradient(90deg, var(--color-skeleton) 25%, var(--color-border-light) 50%, var(--color-skeleton) 75%)",
+            background: "linear-gradient(90deg, var(--color-skeleton-start) 25%, var(--color-skeleton-end) 50%, var(--color-skeleton-start) 75%)",
             backgroundSize: "200% 100%",
             animation: "shimmer 1.5s infinite",
             borderRadius: "8px",
@@ -75,12 +75,13 @@ export function TransactionsChart() {
         <button
           onClick={() => refetch()}
           style={{
-            background: "var(--color-hover)",
+            background: "var(--color-input-disabled)",
             border: "1px solid var(--color-border)",
             borderRadius: "6px",
             padding: "6px 12px",
             cursor: "pointer",
             fontSize: "13px",
+            color: "var(--color-text-primary)",
           }}
         >
           Retry
@@ -96,7 +97,7 @@ export function TransactionsChart() {
         <h3 style={{ margin: "0 0 8px", fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-text-secondary)" }}>
           Transaction Volume (24h)
         </h3>
-        <p style={{ margin: 0, fontSize: "13px", color: "var(--color-text-muted)" }}>
+        <p style={{ margin: 0, fontSize: "13px", color: "var(--color-text-tertiary)" }}>
           No data available yet. The indexer may still be syncing.
         </p>
       </section>
@@ -109,7 +110,7 @@ export function TransactionsChart() {
   return (
     <section className="card">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
-        <h3 style={{ margin: 0, fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "#6b7280" }}>
+        <h3 style={{ margin: 0, fontSize: "12px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-text-secondary)" }}>
           Transaction Volume (24h)
         </h3>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
@@ -122,7 +123,7 @@ export function TransactionsChart() {
           
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             {loading && (
-              <span style={{ fontSize: "11px", color: "#9ca3af" }}>↻ Updating…</span>
+              <span style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>↻ Updating…</span>
             )}
             <button
               onClick={() => refetch()}
@@ -130,12 +131,12 @@ export function TransactionsChart() {
               aria-label="Refresh chart"
               style={{
                 background: "transparent",
-                border: "1px solid #d1d5db",
+                border: "1px solid var(--color-border)",
                 borderRadius: "6px",
                 padding: "4px 8px",
                 cursor: loading ? "not-allowed" : "pointer",
                 fontSize: "12px",
-                color: "#6b7280",
+                color: "var(--color-text-secondary)",
               }}
             >
               ↻
@@ -165,7 +166,7 @@ export function TransactionsChart() {
               style={{
                 flex: 1,
                 height: `${Math.max(heightPct, 2)}%`,
-                background: m.successRate >= 99 ? "var(--color-primary)" : m.successRate >= 95 ? "#f59e0b" : "#ef4444",
+                background: m.successRate >= 99 ? "var(--color-primary)" : m.successRate >= 95 ? "var(--color-warning)" : "var(--color-error)",
                 borderRadius: "2px 2px 0 0",
                 transition: "height 0.3s ease",
                 minWidth: "2px",
@@ -177,37 +178,37 @@ export function TransactionsChart() {
 
       {/* X-axis labels */}
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
-        <span style={{ fontSize: "10px", color: "var(--color-text-muted)" }}>
+        <span style={{ fontSize: "10px", color: "var(--color-text-tertiary)" }}>
           {formatTime(metrics[0].timestamp)}
         </span>
-        <span style={{ fontSize: "10px", color: "var(--color-text-muted)" }}>
+        <span style={{ fontSize: "10px", color: "var(--color-text-tertiary)" }}>
           {formatTime(metrics[metrics.length - 1].timestamp)}
         </span>
       </div>
 
       {/* Summary row */}
-      <div style={{ display: "flex", gap: "16px", marginTop: "12px", paddingTop: "12px", borderTop: "1px solid var(--color-border-light)" }}>
+      <div style={{ display: "flex", gap: "16px", marginTop: "12px", paddingTop: "12px", borderTop: "1px solid var(--color-border)" }}>
         <div>
-          <div style={{ fontSize: "11px", color: "var(--color-text-muted)" }}>Total txs</div>
+          <div style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>Total txs</div>
           <div style={{ fontSize: "16px", fontWeight: 700 }}>
             {metrics.reduce((s, m) => s + m.transactionCount, 0).toLocaleString()}
           </div>
         </div>
         <div>
-          <div style={{ fontSize: "11px", color: "var(--color-text-muted)" }}>Avg fee</div>
+          <div style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>Avg fee</div>
           <div style={{ fontSize: "16px", fontWeight: 700 }}>
             {(metrics.reduce((s, m) => s + m.averageFee, 0) / metrics.length).toFixed(0)} str
           </div>
         </div>
         <div>
-          <div style={{ fontSize: "11px", color: "var(--color-text-muted)" }}>Success rate</div>
+          <div style={{ fontSize: "11px", color: "var(--color-text-tertiary)" }}>Success rate</div>
           <div style={{ fontSize: "16px", fontWeight: 700 }}>
             {(metrics.reduce((s, m) => s + m.successRate, 0) / metrics.length).toFixed(1)}%
           </div>
         </div>
       </div>
 
-      <p style={{ margin: "8px 0 0", fontSize: "10px", color: "var(--color-text-muted)" }}>
+      <p style={{ margin: "8px 0 0", fontSize: "10px", color: "var(--color-text-disabled)" }}>
         {metrics.length} data points · auto-refreshes every 30s
       </p>
     </section>

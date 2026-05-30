@@ -1,0 +1,74 @@
+{
+  "app": {
+    "title": "Stellar Analytics Dashboard",
+    "network": "Network",
+    "latestLedger": "Latest ledger",
+    "refreshing": "Refreshing…"
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "ledgers": "Ledgers",
+    "transactions": "Transactions"
+  },
+  "metrics": {
+    "totalLedgers": "Total Ledgers",
+    "totalTransactions": "Total Transactions",
+    "totalOperations": "Total Operations",
+    "totalAccounts": "Total Accounts",
+    "activeAccounts24h": "Active Accounts (24h)",
+    "volume24h": "Volume (24h)",
+    "avgFee24h": "Avg Fee (24h)",
+    "successRate24h": "Success Rate (24h)"
+  },
+  "errors": {
+    "failedToLoad": "Failed to load dashboard data",
+    "couldNotRefresh": "Could not refresh data",
+    "retry": "Retry"
+  },
+  "ledgers": {
+    "title": "Ledgers",
+    "noLedgers": "No ledgers available yet. The indexer may still be syncing.",
+    "sequence": "Sequence",
+    "successfulTx": "Successful Tx",
+    "failedTx": "Failed Tx",
+    "operations": "Operations",
+    "closedAt": "Closed At"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "noTransactions": "No transactions available yet. The indexer may still be syncing.",
+    "hash": "Hash",
+    "status": "Status",
+    "ledger": "Ledger",
+    "sourceAccount": "Source Account",
+    "fee": "Fee",
+    "operations": "Operations",
+    "createdAt": "Created At",
+    "success": "Success",
+    "failed": "Failed"
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page",
+    "of": "of",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "theme": {
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode"
+  },
+  "language": {
+    "select": "Select Language",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "japanese": "日本語",
+    "chinese": "中文"
+  },
+  "export": {
+    "export": "Export",
+    "csv": "Export as CSV",
+    "json": "Export as JSON"
+  }
+}

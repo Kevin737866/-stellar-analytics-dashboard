@@ -1,0 +1,74 @@
+{
+  "app": {
+    "title": "Stellarアナリティクスダッシュボード",
+    "network": "ネットワーク",
+    "latestLedger": "最新のレジャー",
+    "refreshing": "更新中…"
+  },
+  "tabs": {
+    "dashboard": "ダッシュボード",
+    "ledgers": "レジャー",
+    "transactions": "トランザクション"
+  },
+  "metrics": {
+    "totalLedgers": "レジャー総数",
+    "totalTransactions": "トランザクション総数",
+    "totalOperations": "オペレーション総数",
+    "totalAccounts": "アカウント総数",
+    "activeAccounts24h": "アクティブアカウント（24時間）",
+    "volume24h": "取引高（24時間）",
+    "avgFee24h": "平均手数料（24時間）",
+    "successRate24h": "成功率（24時間）"
+  },
+  "errors": {
+    "failedToLoad": "ダッシュボードデータの読み込みに失敗しました",
+    "couldNotRefresh": "データを更新できませんでした",
+    "retry": "再試行"
+  },
+  "ledgers": {
+    "title": "レジャー",
+    "noLedgers": "まだレジャーがありません。インデクサーがまだ同期中かもしれません。",
+    "sequence": "シーケンス",
+    "successfulTx": "成功したトランザクション",
+    "failedTx": "失敗したトランザクション",
+    "operations": "オペレーション",
+    "closedAt": "クローズ日時"
+  },
+  "transactions": {
+    "title": "トランザクション",
+    "noTransactions": "まだトランザクションがありません。インデクサーがまだ同期中かもしれません。",
+    "hash": "ハッシュ",
+    "status": "ステータス",
+    "ledger": "レジャー",
+    "sourceAccount": "送信元アカウント",
+    "fee": "手数料",
+    "operations": "オペレーション",
+    "createdAt": "作成日時",
+    "success": "成功",
+    "failed": "失敗"
+  },
+  "pagination": {
+    "rowsPerPage": "1ページあたりの行数",
+    "of": "/",
+    "previous": "前へ",
+    "next": "次へ"
+  },
+  "theme": {
+    "switchToDark": "ダークモードに切り替え",
+    "switchToLight": "ライトモードに切り替え"
+  },
+  "language": {
+    "select": "言語を選択",
+    "english": "English",
+    "spanish": "Español",
+    "french": "Français",
+    "german": "Deutsch",
+    "japanese": "日本語",
+    "chinese": "中文"
+  },
+  "export": {
+    "export": "エクスポート",
+    "csv": "CSVとしてエクスポート",
+    "json": "JSONとしてエクスポート"
+  }
+}
