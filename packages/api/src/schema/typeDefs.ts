@@ -167,6 +167,16 @@ export const typeDefs = gql`
     before: String
   }
 
+  enum SortDirection {
+    ASC
+    DESC
+  }
+
+  input SortInput {
+    field: String!
+    direction: SortDirection!
+  }
+
   input TimeRangeInput {
     startTime: DateTime
     endTime: DateTime
@@ -205,6 +215,7 @@ export const typeDefs = gql`
     ledgers(
       pagination: PaginationInput
       timeRange: TimeRangeInput
+      sort: [SortInput!]
     ): Connection<Ledger>!
     
     ledger(sequence: Int!): Ledger
@@ -214,6 +225,7 @@ export const typeDefs = gql`
       pagination: PaginationInput
       timeRange: TimeRangeInput
       filter: TransactionFilterInput
+      sort: [SortInput!]
     ): Connection<Transaction>!
     
     transaction(hash: String!): Transaction
@@ -223,6 +235,7 @@ export const typeDefs = gql`
       pagination: PaginationInput
       timeRange: TimeRangeInput
       filter: OperationFilterInput
+      sort: [SortInput!]
     ): Connection[Operation]!
     
     operation(id: String!): Operation
@@ -231,6 +244,7 @@ export const typeDefs = gql`
     accounts(
       pagination: PaginationInput
       filter: AccountFilterInput
+      sort: [SortInput!]
     ): Connection[Account]!
     
     account(accountId: String!): Account
@@ -239,6 +253,7 @@ export const typeDefs = gql`
     assets(
       pagination: PaginationInput
       filter: AssetFilterInput
+      sort: [SortInput!]
     ): Connection[Asset]!
     
     asset(assetType: String!, assetCode: String, assetIssuer: String): Asset
@@ -246,17 +261,20 @@ export const typeDefs = gql`
     # Analytics queries
     networkMetrics(
       timeRange: TimeRangeInput
+      sort: [SortInput!]
     ): [NetworkMetrics!]!
     
     assetMetrics(
       pagination: PaginationInput
       filter: AssetFilterInput
       timeRange: TimeRangeInput
+      sort: [SortInput!]
     ): [AssetMetrics!]!
     
     accountMetrics(
       accountId: String!
       timeRange: TimeRangeInput
+      sort: [SortInput!]
     ): [AccountMetrics!]!
 
     # Aggregation queries

@@ -32,6 +32,18 @@ export const PaginationArgsSchema = z.object({
 });
 export type PaginationArgs = z.infer<typeof PaginationArgsSchema>;
 
+export const SortDirectionSchema = z.enum(['ASC', 'DESC']);
+export type SortDirection = z.infer<typeof SortDirectionSchema>;
+
+export const SortInputSchema = z.object({
+  field: z.string().min(1),
+  direction: SortDirectionSchema,
+});
+export type SortInput = z.infer<typeof SortInputSchema>;
+
+export const SortArgsSchema = z.array(SortInputSchema).min(1).max(5);
+export type SortArgs = z.infer<typeof SortArgsSchema>;
+
 export const TimeRangeArgsSchema = z.object({
   startTime: z.string().datetime().optional(),
   endTime: z.string().datetime().optional(),

@@ -27,10 +27,12 @@ export const LEDGERS_QUERY = gql`
     $first: Int
     $after: String
     $timeRange: TimeRangeInput
+    $sort: [SortInput!]
   ) {
     ledgers(
       pagination: { first: $first, after: $after }
       timeRange: $timeRange
+      sort: $sort
     ) {
       edges {
         cursor
@@ -69,11 +71,13 @@ export const TRANSACTIONS_QUERY = gql`
     $after: String
     $timeRange: TimeRangeInput
     $filter: TransactionFilterInput
+    $sort: [SortInput!]
   ) {
     transactions(
       pagination: { first: $first, after: $after }
       timeRange: $timeRange
       filter: $filter
+      sort: $sort
     ) {
       edges {
         cursor

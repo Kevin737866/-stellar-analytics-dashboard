@@ -1,5 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { db } from '../database/connection';
+import { SortArgs } from '@stellar-analytics/shared';
+import { ValidationService } from '../services/validation';
+import { buildOrderBy } from '../utils/pagination';
 
 export const analyticsResolvers = {
   Query: {
@@ -7,11 +10,13 @@ export const analyticsResolvers = {
       parent: any,
       args: {
         timeRange?: { startTime?: string; endTime?: string };
+        sort?: { field: string; direction: 'ASC' | 'DESC' }[];
       },
       context: any,
       info: GraphQLResolveInfo
     ) => {
       const { startTime, endTime } = args.timeRange || {};
+      const sort = ValidationService.validateSort(args.sort, 'networkMetric');
 
       let whereClause = 'WHERE 1=1';
       const params: any[] = [];
@@ -32,7 +37,7 @@ export const analyticsResolvers = {
           active_accounts, total_volume, average_fee, success_rate
         FROM network_metrics 
         ${whereClause}
-        ORDER BY timestamp DESC
+        ${buildOrderBy(sort, 'timestamp DESC')}
         LIMIT 1000
       `;
 
@@ -60,6 +65,7 @@ export const analyticsResolvers = {
           assetIssuer?: string;
         };
         timeRange?: { startTime?: string; endTime?: string };
+        sort?: { field: string; direction: 'ASC' | 'DESC' }[];
       },
       context: any,
       info: GraphQLResolveInfo
@@ -67,6 +73,7 @@ export const analyticsResolvers = {
       const { first = 50 } = args.pagination || {};
       const { assetType, assetCode, assetIssuer } = args.filter || {};
       const { startTime, endTime } = args.timeRange || {};
+      const sort = ValidationService.validateSort(args.sort, 'assetMetric');
 
       let whereClause = 'WHERE 1=1';
       const params: any[] = [];
@@ -133,12 +140,14 @@ export const analyticsResolvers = {
       args: {
         accountId: string;
         timeRange?: { startTime?: string; endTime?: string };
+        sort?: { field: string; direction: 'ASC' | 'DESC' }[];
       },
       context: any,
       info: GraphQLResolveInfo
     ) => {
       const { accountId } = args;
       const { startTime, endTime } = args.timeRange || {};
+      const sort = ValidationService.validateSort(args.sort, 'accountMetric');
 
       let whereClause = 'WHERE account_id = $1';
       const params: any[] = [accountId];
@@ -160,7 +169,7 @@ export const analyticsResolvers = {
           first_transaction, last_transaction, is_active, trustlines, signers
         FROM account_metrics 
         ${whereClause}
-        ORDER BY timestamp DESC
+        ${buildOrderBy(sort, 'timestamp DESC')}
         LIMIT 100
       `;
 

@@ -1,6 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { db } from '../database/connection';
-import { Connection, Edge, PageInfo } from '@stellar-analytics/shared';
+import { Connection, Edge, PageInfo, SortArgs } from '@stellar-analytics/shared';
+import { ValidationService } from '../services/validation';
+import { buildOrderBy } from '../utils/pagination';
 
 export const ledgerResolvers = {
   Query: {
@@ -9,12 +11,14 @@ export const ledgerResolvers = {
       args: {
         pagination?: { first?: number; after?: string; last?: number; before?: string };
         timeRange?: { startTime?: string; endTime?: string };
+        sort?: { field: string; direction: 'ASC' | 'DESC' }[];
       },
       context: any,
       info: GraphQLResolveInfo
     ): Promise<Connection<any>> => {
       const { first = 20, after, last, before } = args.pagination || {};
       const { startTime, endTime } = args.timeRange || {};
+      const sort = ValidationService.validateSort(args.sort, 'ledger');
 
       let whereClause = 'WHERE 1=1';
       const params: any[] = [];
@@ -40,7 +44,9 @@ export const ledgerResolvers = {
       }
 
       const limit = Math.min(first || 20, 100);
-      const orderBy = after || !before ? 'ORDER BY sequence DESC' : 'ORDER BY sequence ASC';
+      const orderBy = after || !before
+        ? buildOrderBy(sort, 'sequence DESC')
+        : buildOrderBy(sort, 'sequence ASC');
 
       const query = `
         SELECT 

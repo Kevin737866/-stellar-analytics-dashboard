@@ -1,10 +1,21 @@
 import { ApolloClient, InMemoryCache, createHttpLink, split } from '@apollo/client'
 import { getMainDefinition } from '@apollo/client/utilities'
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
+import { createPersistedQueryLink } from '@apollo/client/link/persisted-queries'
 import { createClient } from 'graphql-ws'
 
 const httpLink = createHttpLink({
   uri: '/graphql',
+})
+
+const persistedQueryLink = createPersistedQueryLink({
+  sha256: async (document) => {
+    const text = typeof document === 'string' ? document : JSON.stringify(document)
+    const encoded = new TextEncoder().encode(text)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encoded)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  },
 })
 
 const wsLink = new GraphQLWsLink(
@@ -25,7 +36,7 @@ const splitLink = split(
     )
   },
   wsLink,
-  httpLink,
+  persistedQueryLink.concat(httpLink),
 )
 
 export const apolloClient = new ApolloClient({

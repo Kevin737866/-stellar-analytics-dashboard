@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from 'pg';
 import { createClient } from 'redis';
 import winston from 'winston';
+import { dbCircuitBreaker, redisCircuitBreaker } from '../services/circuit-breaker';
 
 export class DatabaseConnection {
   private static instance: DatabaseConnection;
@@ -89,13 +90,15 @@ export class DatabaseConnection {
   }
 
   public async query<T = any>(text: string, params?: any[]): Promise<T[]> {
-    const client = await this.getClient();
-    try {
-      const result = await client.query(text, params);
-      return result.rows;
-    } finally {
-      client.release();
-    }
+    return dbCircuitBreaker.execute(async () => {
+      const client = await this.getClient();
+      try {
+        const result = await client.query(text, params);
+        return result.rows;
+      } finally {
+        client.release();
+      }
+    });
   }
 
   public async queryOne<T = any>(text: string, params?: any[]): Promise<T | null> {
@@ -120,17 +123,21 @@ export class DatabaseConnection {
 
   // Redis helper methods
   public async cacheSet(key: string, value: any, ttl?: number): Promise<void> {
-    const serializedValue = JSON.stringify(value);
-    if (ttl) {
-      await this.redis.setEx(key, ttl, serializedValue);
-    } else {
-      await this.redis.set(key, serializedValue);
-    }
+    return redisCircuitBreaker.execute(async () => {
+      const serializedValue = JSON.stringify(value);
+      if (ttl) {
+        await this.redis.setEx(key, ttl, serializedValue);
+      } else {
+        await this.redis.set(key, serializedValue);
+      }
+    });
   }
 
   public async cacheGet<T = any>(key: string): Promise<T | null> {
-    const value = await this.redis.get(key);
-    return value ? JSON.parse(value) : null;
+    return redisCircuitBreaker.execute(async () => {
+      const value = await this.redis.get(key);
+      return value ? JSON.parse(value) : null;
+    });
   }
 
   public async cacheDel(key: string): Promise<void> {

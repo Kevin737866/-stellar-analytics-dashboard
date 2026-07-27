@@ -1,5 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { db } from '../database/connection';
+import { SortArgs } from '@stellar-analytics/shared';
+import { ValidationService } from '../services/validation';
+import { buildOrderBy } from '../utils/pagination';
 
 export const transactionResolvers = {
   Query: {
@@ -15,6 +18,7 @@ export const transactionResolvers = {
           hasMemo?: boolean;
           memoType?: string;
         };
+        sort?: { field: string; direction: 'ASC' | 'DESC' }[];
       },
       context: any,
       info: GraphQLResolveInfo
@@ -22,6 +26,7 @@ export const transactionResolvers = {
       const { first = 20, after, last, before } = args.pagination || {};
       const { startTime, endTime } = args.timeRange || {};
       const { successful, minFee, maxFee, hasMemo, memoType } = args.filter || {};
+      const sort = ValidationService.validateSort(args.sort, 'transaction');
 
       let whereClause = 'WHERE 1=1';
       const params: any[] = [];
@@ -67,7 +72,9 @@ export const transactionResolvers = {
       }
 
       const limit = Math.min(first || 20, 100);
-      const orderBy = after || !before ? 'ORDER BY created_at DESC' : 'ORDER BY created_at ASC';
+      const orderBy = after || !before
+        ? buildOrderBy(sort, 'created_at DESC')
+        : buildOrderBy(sort, 'created_at ASC');
 
       const query = `
         SELECT 

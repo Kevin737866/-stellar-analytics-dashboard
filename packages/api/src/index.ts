@@ -14,6 +14,7 @@ import { typeDefs } from './schema/typeDefs';
 import { resolvers } from './resolvers';
 import { db } from './database/connection';
 import * as loaders from './loaders';
+import { exportTransactions, exportLedgers, exportOperations } from './services/export';
 
 // Load environment variables
 dotenv.config();
@@ -90,6 +91,40 @@ class ApiServer {
       res.set('Content-Type', 'text/plain');
       res.send('# HELP graphql_server_status Status of the GraphQL server\n# TYPE graphql_server_status gauge\ngraphql_server_status 1\n');
     });
+
+    // Export rate limiter
+    const exportLimiter = rateLimit({
+      windowMs: 60 * 1000,
+      max: 10,
+      message: 'Too many export requests, please try again later.',
+    });
+
+    this.app.get('/export/transactions', exportLimiter, (req, res) => {
+      exportTransactions(res, {
+        startTime: req.query.startTime as string,
+        endTime: req.query.endTime as string,
+        format: req.query.format as string,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 10000,
+      });
+    });
+
+    this.app.get('/export/ledgers', exportLimiter, (req, res) => {
+      exportLedgers(res, {
+        startTime: req.query.startTime as string,
+        endTime: req.query.endTime as string,
+        format: req.query.format as string,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 10000,
+      });
+    });
+
+    this.app.get('/export/operations', exportLimiter, (req, res) => {
+      exportOperations(res, {
+        startTime: req.query.startTime as string,
+        endTime: req.query.endTime as string,
+        format: req.query.format as string,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 10000,
+      });
+    });
   }
 
   private setupApolloServer(): void {
@@ -106,18 +141,35 @@ class ApiServer {
         };
       },
       introspection: process.env.NODE_ENV !== 'production',
+      persistedQueries: { ttl: 900 },
       plugins: [
         {
-          requestDidStart() {
+          requestDidStart(requestContext) {
+            const logger = (requestContext as any).context?.logger || this.logger;
+            const timeoutMs = parseInt(process.env.QUERY_TIMEOUT_MS || '30000');
+            let timer: NodeJS.Timeout | undefined;
+
+            if (timeoutMs > 0) {
+              timer = setTimeout(() => {
+                logger?.warn('GraphQL query timeout', {
+                  operation: requestContext.request.operationName,
+                  timeoutMs,
+                });
+              }, timeoutMs);
+            }
+
             return {
+              willSendResponse(requestContext) {
+                if (timer) clearTimeout(timer);
+              },
               didResolveOperation(requestContext) {
-                this.logger?.info('GraphQL operation resolved', {
+                logger?.info('GraphQL operation resolved', {
                   operation: requestContext.request.operationName,
                   variables: requestContext.request.variables,
                 });
               },
               didEncounterErrors(requestContext) {
-                this.logger?.error('GraphQL operation errors', {
+                logger?.error('GraphQL operation errors', {
                   operation: requestContext.request.operationName,
                   errors: requestContext.errors,
                 });
