@@ -120,7 +120,7 @@ jobs:
 
       - name: Upload TypeScript SARIF
         if: failure()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: api-typecheck.sarif
           category: typescript-strict
@@ -172,7 +172,7 @@ jobs:
 
       - name: Upload ESLint SARIF
         if: failure()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: eslint-results.sarif
           category: custom-eslint-rules
