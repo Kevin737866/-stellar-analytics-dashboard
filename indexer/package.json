@@ -36,7 +36,7 @@
     "pino-pretty": "^11.3.0",
     "pino-roll": "^1.0.0",
     "prom-client": "^15.1.2",
-    "ws": "^8.20.0"
+    "ws": "^8.21.1"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
