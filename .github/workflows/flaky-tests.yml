@@ -145,7 +145,7 @@ jobs:
       # If promote-flaky wrote new entries, open an automated PR
       - name: Open PR with updated quarantine list
         if: steps.promote.outputs.exit_code == '1'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'test(flaky): auto-quarantine newly detected flaky tests'

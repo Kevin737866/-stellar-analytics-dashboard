@@ -122,7 +122,7 @@ jobs:
 
       - name: Open PR with updated snapshots
         if: ${{ inputs.update_snapshots }}
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: 'test(visual): update baseline snapshots'
           title: 'chore: update visual regression baselines'
