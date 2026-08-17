@@ -9,14 +9,14 @@
   },
   "dependencies": {
     "@stellar-analytics/shared": "workspace:*",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.21.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dataloader": "^2.2.3",
     "express": "^5.1.0",
     "graphql": "^16.11.0",
     "graphql-ws": "^5.16.0",
-    "pg": "^8.16.3",
+    "pg": "^8.23.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
