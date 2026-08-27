@@ -1,0 +1,1 @@
+Solution proposal for Security: Add authorization fuzz tests
