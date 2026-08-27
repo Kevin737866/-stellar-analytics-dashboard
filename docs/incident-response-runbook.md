@@ -1395,13 +1395,14 @@ curl -X POST http://localhost:3001/backfill \
 | `docker-compose.yml` | Production service definitions |
 | `docker-compose.dev.yml` | Development service definitions |
 | `packages/api/.env` | API environment configuration |
-| `packages/indexer/.env` | Indexer environment configuration |
+| `indexer/.env` | Indexer environment configuration |
 | `packages/indexer/.node-pg-migraterc` | Database migration configuration |
 
 ### D. Related Documentation
 
 | Document | Location | Content |
 |----------|----------|---------|
+| Incident Drill Log | `docs/operations/incident-drills.md` | Backup restore, PITR, and restart drill evidence |
 | Error Handling & Logging | `docs/error-handling-and-logging.md` | Winston config, log levels, GraphQL error handling |
 | Backup & Disaster Recovery | `docs/backup-disaster-recovery.md` | Backup strategy, PITR, restore procedures |
 | Query Performance | `docs/query-performance.md` | Index strategy, slow query monitoring, caching |
