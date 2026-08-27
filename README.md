@@ -66,7 +66,7 @@ pnpm install
 docker compose -f docker-compose.dev.yml up -d postgres redis
 ```
 
-3. Copy and configure environment files:
+3. Copy and configure environment files (see [`docs/environment-variables.md`](./docs/environment-variables.md) for the full reference):
 
 ```bash
 cp indexer/.env.example       indexer/.env

@@ -166,61 +166,18 @@ These tests are fast (~< 1 s) and require no Docker or network.
 
 ## 5. Environment variables reference
 
-### Indexer (`indexer/.env`)
+Copy the template files during first-time setup (step 4 above), then consult
+[`docs/environment-variables.md`](./docs/environment-variables.md) for the
+complete reference covering every variable across the indexer, API, frontend,
+E2E tests, and backup service — including defaults, required/optional status,
+and startup failure behaviour.
 
-```dotenv
-# ── Network ────────────────────────────────────────────────────────────────
-STELLAR_NETWORK=testnet          # testnet | mainnet
-STELLAR_MOCK=false               # true = use built-in mock, no network calls
-
-# ── Database ───────────────────────────────────────────────────────────────
-DATABASE_URL=postgresql://stellar_user:stellar_password@localhost:5432/stellar_analytics_dev
-
-# ── Polling ────────────────────────────────────────────────────────────────
-POLL_INTERVAL_MS=5000            # How often to poll Horizon (ms)
-
-# ── Ports ──────────────────────────────────────────────────────────────────
-HEALTH_PORT=3001                 # Indexer health-check endpoint
-WS_PORT=8080                     # WebSocket broadcast server
-
-# ── Logging ────────────────────────────────────────────────────────────────
-LOG_LEVEL=info                   # trace | debug | info | warn | error | fatal
-LOG_PRETTY=true                  # Human-readable output in dev
-
-# ── Backfill (optional) ────────────────────────────────────────────────────
-BACKFILL_CONCURRENCY=4
-BACKFILL_BATCH_SIZE=10
-BACKFILL_BATCH_DELAY_MS=200
-```
-
-The full list with documentation for every variable is in
-`indexer/.env.example`.
-
-### API (`packages/api/.env`)
-
-```dotenv
-DATABASE_URL=postgresql://stellar_user:stellar_password@localhost:5432/stellar_analytics_dev
-REDIS_URL=redis://localhost:6379
-PORT=4000
-NODE_ENV=development
-CORS_ORIGIN=*
-JWT_SECRET=dev-secret-change-in-production-minimum-32-chars
-LOG_LEVEL=info
-```
-
-The full list is in `packages/api/.env.example`.
-
-### Frontend (Vite)
-
-Create `frontend/.env.local` if you need to override defaults:
-
-```dotenv
-VITE_GRAPHQL_URL=http://localhost:4000/graphql   # default
-VITE_STELLAR_NETWORK=testnet                      # displayed in the UI
-```
-
-The frontend has sensible defaults; no `.env` file is needed for local dev
-unless you change the API port.
+| Service | Template file |
+|---------|---------------|
+| Indexer | `indexer/.env.example` |
+| API | `packages/api/.env.example` |
+| Frontend | `frontend/.env.local` (optional overrides) |
+| E2E | `packages/e2e/.env.example` |
 
 ---
 
