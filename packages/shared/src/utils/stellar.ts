@@ -1,5 +1,5 @@
 import { Asset, OperationType } from '../types/stellar';
-import { Horizon } from '@stellar/stellar-sdk';
+import { Horizon, StrKey } from '@stellar/stellar-sdk';
 import { AssetCodeSchema, AddressSchema } from './validation';
 
 /**
@@ -83,7 +83,7 @@ export function formatBalance(balance: string, asset?: Asset): string {
     const xlm = stroopsToXlm(balance);
     return `${parseFloat(xlm).toLocaleString()} XLM`;
   }
-  
+
   const numBalance = parseFloat(balance);
   return `${numBalance.toLocaleString()} ${asset.asset_code}`;
 }
@@ -118,28 +118,67 @@ export function getOperationTypeName(type: OperationType): string {
     liquidity_pool_withdraw: 'Liquidity Pool Withdraw',
     invoke_host_function: 'Invoke Host Function',
   };
-  
+
   return typeNames[type] || type;
 }
 
+export interface ValidateAddressOptions {
+  /** Allow multiplexed (M...) Stellar account addresses */
+  allowMuxed?: boolean;
+  /** Allow contract (C...) addresses */
+  allowContract?: boolean;
+}
+
 /**
- * Validate Stellar address
+ * Validate Stellar address.
+ *
+ * Checks if the string is a valid Stellar public key address.
+ * Standard Ed25519 public keys ('G...') are always checked.
+ * Optionally allows multiplexed ('M...') or contract ('C...') addresses.
  */
-export function isValidStellarAddress(address: string): boolean {
-  try {
-    return Horizon.AccountResponse.checkAddress(address);
-  } catch {
+export function isValidStellarAddress(
+  address: string,
+  options: ValidateAddressOptions = {}
+): boolean {
+  if (!address || typeof address !== 'string') {
     return false;
   }
+
+  const trimmed = address.trim();
+  if (StrKey.isValidEd25519PublicKey(trimmed)) {
+    return true;
+  }
+
+  if (options.allowMuxed && StrKey.isValidMed25519PublicKey(trimmed)) {
+    return true;
+  }
+
+  if (options.allowContract && StrKey.isValidContract(trimmed)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Validate Stellar address and return the trimmed address, or throw an error.
+ */
+export function validateStellarAddress(address: string, options?: ValidateAddressOptions): string {
+  if (!isValidStellarAddress(address, options)) {
+    throw new Error(`Invalid Stellar address: ${address}`);
+  }
+  return address.trim();
 }
 
 /**
  * Validate Stellar secret key (seed)
  */
 export function isValidStellarSecret(secret: string): boolean {
+  if (!secret || typeof secret !== 'string') {
+    return false;
+  }
   try {
-    const keypair = StellarKeypair.fromSecret(secret);
-    return !!keypair.publicKey();
+    return StrKey.isValidEd25519SecretSeed(secret.trim());
   } catch {
     return false;
   }
@@ -167,12 +206,12 @@ export function formatDuration(startTime: string, endTime: string): string {
   const start = new Date(startTime);
   const end = new Date(endTime);
   const diffMs = end.getTime() - start.getTime();
-  
+
   const seconds = Math.floor(diffMs / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  
+
   if (days > 0) return `${days}d ${hours % 24}h`;
   if (hours > 0) return `${hours}h ${minutes % 60}m`;
   if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
@@ -195,12 +234,9 @@ export function debounce<T extends (...args: any[]) => any>(
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
-  
+
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
 }
-
-// Import Stellar SDK types
-import * as StellarKeypair from '@stellar/stellar-sdk';

@@ -18,10 +18,7 @@ this.logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      ),
+      format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
     }),
     new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
     new winston.transports.File({ filename: 'logs/combined.log' }),
@@ -33,27 +30,27 @@ this.logger = winston.createLogger({
 
 Controlled by the `LOG_LEVEL` environment variable. Valid values (in order of verbosity):
 
-| Level | Usage |
-|-------|-------|
-| `error` | Unhandled errors, startup failures, GraphQL errors |
-| `warn` | Slow queries (>1000ms), WebSocket errors, rate limit hits |
-| `info` | Server startup, DB connection, GraphQL operations, WS connect/disconnect |
-| `debug` | Verbose request details (not enabled by default) |
+| Level   | Usage                                                                    |
+| ------- | ------------------------------------------------------------------------ |
+| `error` | Unhandled errors, startup failures, GraphQL errors                       |
+| `warn`  | Slow queries (>1000ms), WebSocket errors, rate limit hits                |
+| `info`  | Server startup, DB connection, GraphQL operations, WS connect/disconnect |
+| `debug` | Verbose request details (not enabled by default)                         |
 
 ### Log Files
 
-| File | Contents |
-|------|----------|
-| `logs/error.log` | Error-level messages only |
-| `logs/combined.log` | All log levels |
+| File                | Contents                  |
+| ------------------- | ------------------------- |
+| `logs/error.log`    | Error-level messages only |
+| `logs/combined.log` | All log levels            |
 
 Console output uses colorized simple format for readability in development. File output uses JSON format for structured log ingestion.
 
 ### Environment Variable
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `LOG_LEVEL` | `info` | Minimum log level to emit |
+| Variable    | Default | Description               |
+| ----------- | ------- | ------------------------- |
+| `LOG_LEVEL` | `info`  | Minimum log level to emit |
 
 ## GraphQL Error Handling
 
@@ -90,33 +87,33 @@ Slow GraphQL query detected { operation, duration }
 All GraphQL errors are processed by the `formatGraphQLError` hook before being sent to clients.
 Each error is enriched with two additional `extensions` fields:
 
-| Field | Description |
-|-------|-------------|
-| `code` | Stable error category (see table below) |
+| Field         | Description                                            |
+| ------------- | ------------------------------------------------------ |
+| `code`        | Stable error category (see table below)                |
 | `userMessage` | Short, non-technical message safe to display in the UI |
 
 ### Error Codes
 
-| Code | Meaning | HTTP equivalent |
-|------|---------|-----------------|
-| `INTERNAL_ERROR` | Unexpected server failure | 500 |
-| `NOT_FOUND` | Requested resource does not exist | 404 |
-| `UNAUTHENTICATED` | Request requires a valid login | 401 |
-| `FORBIDDEN` | Authenticated user lacks permission | 403 |
-| `VALIDATION_ERROR` | GraphQL schema or query validation failed | 400 |
-| `BAD_USER_INPUT` | Mutation/query argument is invalid | 400 |
-| `RATE_LIMITED` | Client exceeded the request rate limit | 429 |
-| `SERVICE_UNAVAILABLE` | Upstream service (Horizon) is temporarily down | 503 |
-| `TIMEOUT` | Operation exceeded its time budget | 504 |
-| `QUERY_TOO_COMPLEX` | Query depth/complexity limit exceeded | 400 |
-| `PERSISTED_QUERY_NOT_FOUND` | APQ hash not in cache | 200 (APQ re-send) |
+| Code                        | Meaning                                        | HTTP equivalent   |
+| --------------------------- | ---------------------------------------------- | ----------------- |
+| `INTERNAL_ERROR`            | Unexpected server failure                      | 500               |
+| `NOT_FOUND`                 | Requested resource does not exist              | 404               |
+| `UNAUTHENTICATED`           | Request requires a valid login                 | 401               |
+| `FORBIDDEN`                 | Authenticated user lacks permission            | 403               |
+| `VALIDATION_ERROR`          | GraphQL schema or query validation failed      | 400               |
+| `BAD_USER_INPUT`            | Mutation/query argument is invalid             | 400               |
+| `RATE_LIMITED`              | Client exceeded the request rate limit         | 429               |
+| `SERVICE_UNAVAILABLE`       | Upstream service (Horizon) is temporarily down | 503               |
+| `TIMEOUT`                   | Operation exceeded its time budget             | 504               |
+| `QUERY_TOO_COMPLEX`         | Query depth/complexity limit exceeded          | 400               |
+| `PERSISTED_QUERY_NOT_FOUND` | APQ hash not in cache                          | 200 (APQ re-send) |
 
 ### Behaviour by environment
 
-| Environment | `message` field | `extensions.internalMessage` |
-|-------------|----------------|------------------------------|
+| Environment | `message` field            | `extensions.internalMessage`           |
+| ----------- | -------------------------- | -------------------------------------- |
 | Development | Original technical message | Present when it differs from `message` |
-| Production | `userMessage` (safe copy) | Absent |
+| Production  | `userMessage` (safe copy)  | Absent                                 |
 
 Sensitive fields (`stacktrace`, `exception`) are **always** stripped from client responses in both environments.
 
@@ -135,6 +132,391 @@ a classified error with an appropriate icon, colour, and optional "Try again" bu
 
 ```tsx
 if (error) return <ApiErrorMessage error={error} onRetry={refetch} />;
+```
+
+## API Error Contract Examples
+
+This section defines the canonical error response contracts returned by the GraphQL API across both development and production environments.
+
+<!-- error-contract-codes: INTERNAL_ERROR, NOT_FOUND, UNAUTHENTICATED, FORBIDDEN, VALIDATION_ERROR, BAD_USER_INPUT, RATE_LIMITED, SERVICE_UNAVAILABLE, TIMEOUT, QUERY_TOO_COMPLEX, PERSISTED_QUERY_NOT_FOUND -->
+
+### Response Envelope Structure
+
+All GraphQL operations follow the standard GraphQL specification error envelope:
+
+```json
+{
+  "errors": [
+    {
+      "message": "<string>",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["<fieldPath>"],
+      "extensions": {
+        "code": "<ErrorCode>",
+        "userMessage": "<UserFriendlyString>",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+### Environment Contracts
+
+#### Development Environment Contract
+
+In development (`NODE_ENV !== 'production'`), technical messages are preserved in `message` and `extensions.internalMessage` is populated when the technical message differs from the user-friendly copy. Sensitive fields (`stacktrace`, `exception`) are stripped from client responses.
+
+```json
+{
+  "errors": [
+    {
+      "message": "Relation \"account_balances\" does not exist at character 15",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["account"],
+      "extensions": {
+        "code": "INTERNAL_ERROR",
+        "userMessage": "Something went wrong on our end. Please try again in a moment.",
+        "internalMessage": "Relation \"account_balances\" does not exist at character 15",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### Production Environment Contract
+
+In production (`NODE_ENV === 'production'`), the top-level `message` field is replaced by `userMessage`, `internalMessage` is omitted, and no internal details (SQL errors, hostnames, stack frames) leak to the client.
+
+```json
+{
+  "errors": [
+    {
+      "message": "Something went wrong on our end. Please try again in a moment.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["account"],
+      "extensions": {
+        "code": "INTERNAL_ERROR",
+        "userMessage": "Something went wrong on our end. Please try again in a moment.",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+### Error Code Contracts
+
+#### 1. NOT_FOUND
+
+Returned when a requested ledger, account, transaction, or operation does not exist.
+
+```json
+{
+  "errors": [
+    {
+      "message": "The requested resource could not be found.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["account"],
+      "extensions": {
+        "code": "NOT_FOUND",
+        "userMessage": "The requested resource could not be found.",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### 2. UNAUTHENTICATED
+
+Returned when an endpoint or operation requires authentication and no token was provided, or the token is expired or invalid.
+
+```json
+{
+  "errors": [
+    {
+      "message": "You must be signed in to access this resource.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["me"],
+      "extensions": {
+        "code": "UNAUTHENTICATED",
+        "userMessage": "You must be signed in to access this resource.",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### 3. FORBIDDEN
+
+Returned when an authenticated user lacks the necessary permissions to perform an operation.
+
+```json
+{
+  "errors": [
+    {
+      "message": "You do not have permission to perform this action.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["adminSettings"],
+      "extensions": {
+        "code": "FORBIDDEN",
+        "userMessage": "You do not have permission to perform this action.",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### 4. VALIDATION_ERROR
+
+Returned when GraphQL schema or parameter validation fails.
+
+```json
+{
+  "errors": [
+    {
+      "message": "The request contains invalid parameters. Please review your input and try again.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["transactions"],
+      "extensions": {
+        "code": "VALIDATION_ERROR",
+        "userMessage": "The request contains invalid parameters. Please review your input and try again.",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### 5. BAD_USER_INPUT
+
+Returned when user arguments fail domain-specific constraints (e.g. invalid cursor, invalid dates).
+
+```json
+{
+  "errors": [
+    {
+      "message": "The request contains invalid input. Please check your values and try again.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["ledgers"],
+      "extensions": {
+        "code": "BAD_USER_INPUT",
+        "userMessage": "The request contains invalid input. Please check your values and try again.",
+        "field": "cursor",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### 6. RATE_LIMITED
+
+Returned when a client exceeds the allowed request rate.
+
+```json
+{
+  "errors": [
+    {
+      "message": "Too many requests. Please slow down and try again shortly.",
+      "locations": [
+        {
+          "line": 1,
+          "column": 1
+        }
+      ],
+      "extensions": {
+        "code": "RATE_LIMITED",
+        "userMessage": "Too many requests. Please slow down and try again shortly.",
+        "retryAfterSeconds": 60,
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### 7. SERVICE_UNAVAILABLE
+
+Returned when upstream services (such as Stellar Horizon or database read replica) are temporarily unavailable.
+
+```json
+{
+  "errors": [
+    {
+      "message": "A required service is temporarily unavailable. Please try again later.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["networkMetrics"],
+      "extensions": {
+        "code": "SERVICE_UNAVAILABLE",
+        "userMessage": "A required service is temporarily unavailable. Please try again later.",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### 8. TIMEOUT
+
+Returned when an operation exceeds its execution time budget.
+
+```json
+{
+  "errors": [
+    {
+      "message": "The request took too long to complete. Please try again.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["aggregatedStats"],
+      "extensions": {
+        "code": "TIMEOUT",
+        "userMessage": "The request took too long to complete. Please try again.",
+        "timeoutMs": 10000,
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### 9. QUERY_TOO_COMPLEX
+
+Returned when query depth limit or complexity score exceeds the maximum threshold.
+
+```json
+{
+  "errors": [
+    {
+      "message": "The query is too complex. Please reduce the number of requested fields or lower the pagination limit.",
+      "locations": [
+        {
+          "line": 1,
+          "column": 1
+        }
+      ],
+      "extensions": {
+        "code": "QUERY_TOO_COMPLEX",
+        "userMessage": "The query is too complex. Please reduce the number of requested fields or lower the pagination limit.",
+        "maxDepth": 7,
+        "actualDepth": 9,
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### 10. PERSISTED_QUERY_NOT_FOUND
+
+Returned when Automated Persisted Queries (APQ) hash is not found in cache.
+
+```json
+{
+  "errors": [
+    {
+      "message": "Cached query not found. Please resend the full query.",
+      "extensions": {
+        "code": "PERSISTED_QUERY_NOT_FOUND",
+        "userMessage": "Cached query not found. Please resend the full query.",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+#### 11. INTERNAL_ERROR
+
+Returned for unhandled runtime exceptions. Internal details and stack traces are scrubbed in production.
+
+```json
+{
+  "errors": [
+    {
+      "message": "Something went wrong on our end. Please try again in a moment.",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": ["dashboardMetrics"],
+      "extensions": {
+        "code": "INTERNAL_ERROR",
+        "userMessage": "Something went wrong on our end. Please try again in a moment.",
+        "timestamp": "2026-08-27T12:00:00.000Z"
+      }
+    }
+  ],
+  "data": null
+}
 ```
 
 ## HTTP Error Handling

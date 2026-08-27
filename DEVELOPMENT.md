@@ -21,10 +21,10 @@ Everything a new developer needs to run the Stellar Analytics Dashboard on their
 
 ## 1. Prerequisites
 
-| Tool | Minimum version | How to check |
-|------|----------------|--------------|
+| Tool    | Minimum version     | How to check     |
+| ------- | ------------------- | ---------------- |
 | Node.js | 18 (20 recommended) | `node --version` |
-| pnpm | 9 | `pnpm --version` |
+| pnpm    | 9                   | `pnpm --version` |
 
 See [`docs/node-versions.md`](docs/node-versions.md) for the full version policy, CI alignment, and troubleshooting.
 | Docker Desktop | any recent | `docker --version` |
@@ -105,7 +105,7 @@ will show empty state until the Indexer writes its first ledger.
 
 ## 4. Mock mode (no live Stellar network)
 
-By default the indexer connects to the live Stellar Horizon API.  During
+By default the indexer connects to the live Stellar Horizon API. During
 feature development you often don't need real blockchain data and don't want
 to depend on network availability or rate limits.
 
@@ -129,6 +129,8 @@ STELLAR_MOCK=true pnpm dev:indexer
 - Sequence numbers increment on every poll, just like a live network.
 - No network calls, no Horizon account required, works fully offline.
 - Writes data to Postgres just like normal — the API and frontend are unaffected.
+
+See [`docs/mock-data-limitations.md`](docs/mock-data-limitations.md) for full details on mock limitations, supported operation types, synthetic accounts, and simulation boundaries.
 
 ### How it works internally
 
@@ -156,6 +158,7 @@ pnpm test
 ```
 
 The `ingester.mock.test.ts` suite covers:
+
 - Shape validation of `IngestedData`
 - Consecutive poll sequence increments
 - `fetchLedger` and `fetchLedgerRange` helpers
@@ -228,16 +231,16 @@ unless you change the API port.
 
 ## 6. Port map
 
-| Service | Port | URL |
-|---------|------|-----|
-| Frontend (Vite HMR) | 5173 | http://localhost:5173 |
-| GraphQL API + Playground | 4000 | http://localhost:4000/graphql |
-| GraphQL WebSocket subscriptions | 4000 | ws://localhost:4000/graphql |
-| Indexer health check | 3001 | http://localhost:3001/health |
-| Indexer readiness probe | 3001 | http://localhost:3001/ready |
-| Indexer WebSocket broadcast | 8080 | ws://localhost:8080 |
-| PostgreSQL | 5432 | localhost:5432 |
-| Redis | 6379 | localhost:6379 |
+| Service                         | Port | URL                           |
+| ------------------------------- | ---- | ----------------------------- |
+| Frontend (Vite HMR)             | 5173 | http://localhost:5173         |
+| GraphQL API + Playground        | 4000 | http://localhost:4000/graphql |
+| GraphQL WebSocket subscriptions | 4000 | ws://localhost:4000/graphql   |
+| Indexer health check            | 3001 | http://localhost:3001/health  |
+| Indexer readiness probe         | 3001 | http://localhost:3001/ready   |
+| Indexer WebSocket broadcast     | 8080 | ws://localhost:8080           |
+| PostgreSQL                      | 5432 | localhost:5432                |
+| Redis                           | 6379 | localhost:6379                |
 
 ---
 
@@ -310,11 +313,11 @@ the dev compose stack running separately.
 
 ### Indexer tests — live vs mock
 
-| Test file | Needs network? | Needs DB? |
-|-----------|----------------|-----------|
-| `ingester.mock.test.ts` | **No** | No |
-| `ingester.test.ts` | **Yes** (testnet) | No |
-| `config.test.ts` | No | No |
+| Test file               | Needs network?    | Needs DB? |
+| ----------------------- | ----------------- | --------- |
+| `ingester.mock.test.ts` | **No**            | No        |
+| `ingester.test.ts`      | **Yes** (testnet) | No        |
+| `config.test.ts`        | No                | No        |
 
 Run only the offline tests with:
 
@@ -351,7 +354,7 @@ curl -X POST http://localhost:3001/backfill \
 
 ### Open the GraphQL Playground
 
-Navigate to http://localhost:4000/graphql in your browser.  The playground is
+Navigate to http://localhost:4000/graphql in your browser. The playground is
 enabled automatically in development (`NODE_ENV !== 'production'`).
 
 ### Wipe and reseed local data
@@ -464,15 +467,16 @@ resolved.
 
 ## Further reading
 
-| Document | What it covers |
-|----------|----------------|
-| `CONTRIBUTING.md` | Branch strategy, commit conventions, PR checklist |
-| `docs/node-versions.md` | Supported Node.js and pnpm versions |
-| `CACHING.md` | Redis TTL strategy and cache-aside pattern |
-| `docs/database-migrations.md` | Migration workflow, rollback, CI |
-| `docs/query-performance.md` | Indexes, slow-query monitoring, DataLoader |
-| `docs/error-handling-and-logging.md` | Winston config, log levels, error codes |
-| `docs/security-headers.md` | Helmet configuration |
-| `docs/cors.md` | CORS setup for multi-origin deployments |
-| `indexer/ALERTING.md` | Slack / email alert configuration |
-| `indexer/BACKFILL.md` | Backfill CLI reference |
+| Document                             | What it covers                                                          |
+| ------------------------------------ | ----------------------------------------------------------------------- |
+| `CONTRIBUTING.md`                    | Branch strategy, commit conventions, PR checklist                       |
+| `docs/node-versions.md`              | Supported Node.js and pnpm versions                                     |
+| `CACHING.md`                         | Redis TTL strategy and cache-aside pattern                              |
+| `docs/database-migrations.md`        | Migration workflow, rollback, CI                                        |
+| `docs/query-performance.md`          | Indexes, slow-query monitoring, DataLoader                              |
+| `docs/error-handling-and-logging.md` | Winston config, log levels, error codes                                 |
+| `docs/security-headers.md`           | Helmet configuration                                                    |
+| `docs/cors.md`                       | CORS setup for multi-origin deployments                                 |
+| `indexer/ALERTING.md`                | Slack / email alert configuration                                       |
+| `indexer/BACKFILL.md`                | Backfill CLI reference                                                  |
+| `docs/mock-data-limitations.md`      | Horizon simulation boundaries, synthetic accounts, and mock limitations |
