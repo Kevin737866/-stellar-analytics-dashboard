@@ -38,39 +38,24 @@ Thank you for your interest in contributing to the Stellar Analytics Dashboard! 
 
 ```
 stellar-analytics-dashboard/
+├── indexer/             # Indexer service (runtime source)
+│   └── src/
 ├── packages/
-│   ├── shared/          # Shared types and utilities
-│   │   ├── src/
-│   │   │   ├── types/      # TypeScript type definitions
-│   │   │   ├── utils/      # Utility functions
-│   │   │   └── constants/  # Application constants
-│   │   └── package.json
-│   ├── indexer/         # Data ingestion service
-│   │   ├── src/
-│   │   │   ├── database/   # Database connection and migrations
-│   │   │   ├── services/   # Stellar API integration
-│   │   │   └── utils/      # Helper functions
-│   │   └── package.json
-│   ├── api/            # GraphQL API server
-│   │   ├── src/
-│   │   │   ├── schema/     # GraphQL schema definitions
-│   │   │   ├── resolvers/  # GraphQL resolvers
-│   │   │   ├── loaders/    # DataLoader implementations
-│   │   │   └── database/   # Database connection
-│   │   └── package.json
-│   └── frontend/       # React dashboard
-│       ├── src/
-│       │   ├── components/  # React components
-│       │   ├── pages/       # Page components
-│       │   ├── hooks/       # Custom React hooks
-│       │   ├── graphql/     # GraphQL queries and client
-│       │   ├── utils/       # Utility functions
-│       │   └── types/       # TypeScript types
-│       └── package.json
+│   ├── api/             # GraphQL API server
+│   │   └── src/
+│   ├── e2e/             # End-to-end tests
+│   └── indexer/
+│       └── migrations/  # SQL migrations
+├── frontend/            # React dashboard (Vite)
+│   └── src/
+├── shared/              # Shared types and utilities
+│   └── src/
 ├── docker-compose.yml
 ├── docker-compose.dev.yml
 └── README.md
 ```
+
+See [`docs/architecture.md`](./docs/architecture.md) for canonical paths and system diagrams.
 
 ## 🛠️ Development Workflow
 

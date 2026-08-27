@@ -6,35 +6,41 @@ Monorepo scaffold for a Stellar blockchain analytics platform with a data pipeli
 
 ```text
 .
-+-- indexer/
-�   +-- src/
-�       +-- ingester.ts
-�       +-- transformer.ts
-�       +-- loader.ts
-�       +-- websocket.ts
-�       +-- index.ts
-�       +-- database/schema.sql
-+-- api/
-�   +-- src/
-�       +-- schema.ts
-�       +-- resolvers/
-�       +-- index.ts
-+-- frontend/
-�   +-- src/
-�       +-- components/
-�       +-- hooks/
-�       +-- pages/
-�       +-- App.tsx
-�       +-- main.tsx
-+-- shared/
-�   +-- src/
-�       +-- config/networks.ts
-�       +-- types/
-�       +-- utils/
++-- indexer/                  # Indexer service (runtime)
+|   +-- src/
+|       +-- ingester.ts
+|       +-- transformer.ts
+|       +-- loader.ts
+|       +-- websocket.ts
+|       +-- index.ts
+|       +-- database/schema.sql
++-- packages/
+|   +-- api/                  # GraphQL API server
+|   |   +-- src/
+|   |       +-- schema.ts
+|   |       +-- resolvers/
+|   |       +-- index.ts
+|   +-- e2e/                  # End-to-end tests
+|   +-- indexer/
+|       +-- migrations/       # SQL migrations
++-- frontend/                 # React dashboard (Vite)
+|   +-- src/
+|       +-- components/
+|       +-- hooks/
+|       +-- pages/
+|       +-- App.tsx
+|       +-- main.tsx
++-- shared/                   # Shared types and utilities
+|   +-- src/
+|       +-- config/networks.ts
+|       +-- types/
+|       +-- utils/
 +-- docker-compose.yml
 +-- package.json
 +-- pnpm-workspace.yaml
 ```
+
+See [`docs/architecture.md`](./docs/architecture.md) for the full path map and system diagrams.
 
 ## Stellar Network Config
 

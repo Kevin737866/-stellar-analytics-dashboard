@@ -48,14 +48,14 @@ The Stellar Analytics Dashboard platform consists of three main services plus su
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Frontend (React)                          │
-│              packages/frontend — Port 5173 (dev)                 │
+│                    frontend/ — Port 5173 (dev)                   │
 │            Serves SPA, WebSocket client for live data            │
 └──────────────┬────────────────────────────────┬──────────────────┘
                │ HTTP/WS                         │ WebSocket
                ▼                                 ▼
 ┌──────────────────────────────┐  ┌──────────────────────────────┐
 │      GraphQL API Server      │  │   Indexer Service            │
-│    packages/api — Port 4000  │  │ packages/indexer — Port 3001 │
+│    packages/api — Port 4000  │  │   indexer/ — Port 3001       │
 │                              │  │                              │
 │  ┌────────────────────────┐  │  │  ┌────────────────────────┐  │
 │  │ Apollo Server (GraphQL)│  │  │  │  Horizon Streaming     │  │

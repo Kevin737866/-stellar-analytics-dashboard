@@ -26,7 +26,7 @@ docker info
 
 # 6. .env files exist for each package
 ls packages/api/.env
-ls packages/indexer/.env
+ls indexer/.env
 ```
 
 ---
