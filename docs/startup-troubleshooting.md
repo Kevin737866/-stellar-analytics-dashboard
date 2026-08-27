@@ -1,5 +1,10 @@
 # Startup Troubleshooting
 
+**Last Updated:** 2026-08-27  
+**Last Verified:** 2026-08-27  
+**Next Review:** 2026-11-27  
+**Owner:** Platform Engineering Team
+
 Solutions for the most common Docker, Node, and database startup problems in the Stellar Analytics Dashboard monorepo.
 
 ---

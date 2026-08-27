@@ -1,5 +1,10 @@
 # Deployment Rollback Procedures
 
+**Last Updated:** 2026-08-27  
+**Last Verified:** 2026-08-27  
+**Next Review:** 2026-11-27  
+**Owner:** Platform Engineering Team
+
 Issue #175: Step-by-step rollback procedures for API, frontend, and indexer deployments.
 
 ## Quick Reference
@@ -129,3 +134,9 @@ kubectl rollout status deployment/indexer -n stellar-insights
 - [ ] No error spikes in monitoring dashboards
 - [ ] Notify the team in Slack #stellar-insights channel
 - [ ] Create a post-mortem issue for the failed deployment
+
+## Rollback Verification Log
+
+| Date | Procedure | Environment | Result | Notes |
+|------|-----------|-------------|--------|-------|
+| 2026-08-27 | Rollback procedure review | Documentation | Pass | kubectl commands verified against deployment manifests |
