@@ -34,23 +34,8 @@ export function parseAsset(assetString: string): Asset {
   };
 }
 
-/**
- * Convert stroops to XLM
- */
-export function stroopsToXlm(stroops: string | number): string {
-  const stroopsNum = typeof stroops === 'string' ? BigInt(stroops) : BigInt(stroops);
-  const xlm = Number(stroopsNum) / 10000000;
-  return xlm.toFixed(7);
-}
-
-/**
- * Convert XLM to stroops
- */
-export function xlmToStroops(xlm: string | number): string {
-  const xlmNum = typeof xlm === 'string' ? parseFloat(xlm) : xlm;
-  const stroops = Math.floor(xlmNum * 10000000);
-  return stroops.toString();
-}
+export * from './stroop';
+import { stroopsToXlm } from './stroop';
 
 /**
  * Format balance for display
@@ -58,7 +43,9 @@ export function xlmToStroops(xlm: string | number): string {
 export function formatBalance(balance: string, asset?: Asset): string {
   if (!asset || asset.asset_type === 'native') {
     const xlm = stroopsToXlm(balance);
-    return `${parseFloat(xlm).toLocaleString()} XLM`;
+    const [whole, frac] = xlm.split('.');
+    const formattedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return `${formattedWhole}.${frac} XLM`;
   }
   
   const numBalance = parseFloat(balance);

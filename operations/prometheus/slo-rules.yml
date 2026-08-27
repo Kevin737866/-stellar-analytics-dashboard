@@ -1,0 +1,116 @@
+groups:
+  - name: operational_slo_recording_rules
+    interval: 30s
+    rules:
+      # API Availability SLI: error ratio over multiple windows
+      - record: job:http_requests:error_rate5m
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))
+
+      - record: job:http_requests:error_rate30m
+        expr: sum(rate(http_requests_total{status=~"5.."}[30m])) / sum(rate(http_requests_total[30m]))
+
+      - record: job:http_requests:error_rate1h
+        expr: sum(rate(http_requests_total{status=~"5.."}[1h])) / sum(rate(http_requests_total[1h]))
+
+      - record: job:http_requests:error_rate6h
+        expr: sum(rate(http_requests_total{status=~"5.."}[6h])) / sum(rate(http_requests_total[6h]))
+
+      - record: job:http_requests:error_rate3d
+        expr: sum(rate(http_requests_total{status=~"5.."}[3d])) / sum(rate(http_requests_total[3d]))
+
+      # API Availability SLO 99.9% (0.001 error budget) Multi-window burn rates
+      - record: job:slo_error_budget_burn_rate:1h
+        expr: job:http_requests:error_rate1h / 0.001
+
+      - record: job:slo_error_budget_burn_rate:6h
+        expr: job:http_requests:error_rate6h / 0.001
+
+      - record: job:slo_error_budget_burn_rate:3d
+        expr: job:http_requests:error_rate3d / 0.001
+
+      # Ingestion Lag
+      - record: job:indexer_ledger_lag
+        expr: stellar_network_latest_ledger - indexer_last_processed_ledger_sequence
+
+  - name: operational_slo_alerts
+    rules:
+      # Critical Page Alert: Consuming 2% of budget in 1 hour (Burn Rate > 14.4)
+      - alert: ApiAvailabilitySloCriticalBurnRate
+        expr: (job:http_requests:error_rate1h > (14.4 * 0.001)) and (job:http_requests:error_rate5m > (14.4 * 0.001))
+        for: 2m
+        labels:
+          severity: critical
+          slo: api_availability
+        annotations:
+          summary: "High error budget burn rate on API Availability SLO"
+          description: "API Availability SLO (99.9%) is burning error budget at >14.4x rate (consuming >2% in 1 hour). Current 1h error rate is {{ $value | humanizePercentage }}."
+          runbook_url: "docs/incident-response-runbook.md#58-slow-graphql-queries--high-latency"
+
+      # Ticket Alert: Consuming 5% of budget in 6 hours (Burn Rate > 6.0)
+      - alert: ApiAvailabilitySloElevatedBurnRate
+        expr: (job:http_requests:error_rate6h > (6.0 * 0.001)) and (job:http_requests:error_rate30m > (6.0 * 0.001))
+        for: 15m
+        labels:
+          severity: warning
+          slo: api_availability
+        annotations:
+          summary: "Elevated error budget burn rate on API Availability SLO"
+          description: "API Availability SLO is burning error budget at >6x rate over 6 hours. Current 6h error rate is {{ $value | humanizePercentage }}."
+
+      # Latency SLO Breached: P95 > 500ms for 5 minutes
+      - alert: ApiLatencySloBreached
+        expr: histogram_quantile(0.95, sum(rate(graphql_query_duration_seconds_bucket[5m])) by (le)) * 1000 > 500
+        for: 5m
+        labels:
+          severity: warning
+          slo: api_latency
+        annotations:
+          summary: "GraphQL query latency P95 exceeds SLO target of 500ms"
+          description: "P95 latency is {{ $value }}ms over the last 5 minutes (target: <500ms)."
+          runbook_url: "docs/incident-response-runbook.md#58-slow-graphql-queries--high-latency"
+
+      # Ingestion Lag SLO Breached: Lag > 2 ledgers for 5 minutes
+      - alert: IndexerIngestionLagSloBreached
+        expr: (stellar_network_latest_ledger - indexer_last_processed_ledger_sequence) > 2
+        for: 5m
+        labels:
+          severity: warning
+          slo: indexer_freshness
+        annotations:
+          summary: "Indexer ingestion lag exceeds SLO limit of 2 ledgers"
+          description: "Indexer is lagging behind Horizon network tip by {{ $value }} ledgers (target: <=2 ledgers)."
+          runbook_url: "docs/incident-response-runbook.md#51-horizon-stream-disconnection"
+
+      # Critical Ingestion Lag: Lag > 10 ledgers
+      - alert: IndexerIngestionLagCritical
+        expr: (stellar_network_latest_ledger - indexer_last_processed_ledger_sequence) > 10
+        for: 3m
+        labels:
+          severity: critical
+          slo: indexer_freshness
+        annotations:
+          summary: "Severe indexer lag behind Stellar network tip"
+          description: "Indexer is lagging behind Horizon tip by {{ $value }} ledgers (>10 ledgers threshold)."
+
+      # DLQ Depth Alert: Any items trapped in DLQ
+      - alert: IndexerDeadLetterQueueNonZero
+        expr: indexer_dlq_depth > 0
+        for: 5m
+        labels:
+          severity: warning
+          slo: ingestion_reliability
+        annotations:
+          summary: "Items accumulated in indexer Dead Letter Queue"
+          description: "{{ $value }} items are unprocessable and sitting in the DLQ."
+          runbook_url: "docs/incident-response-runbook.md"
+
+      # PostgreSQL Connection Pool Saturation (>80%)
+      - alert: DatabaseConnectionPoolHighUtilization
+        expr: (db_pool_active_connections / db_pool_max_connections) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          slo: database_health
+        annotations:
+          summary: "PostgreSQL connection pool exceeds 80% capacity"
+          description: "Active connections are at {{ $value }}% of maximum pool allocation."

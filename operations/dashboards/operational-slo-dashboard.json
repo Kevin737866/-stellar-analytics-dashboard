@@ -1,0 +1,732 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "title": "Operational SLO Executive Summary (30-Day Rolling Window)",
+      "type": "row"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Target: >= 99.9% successful HTTP/GraphQL operations",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "max": 100,
+          "min": 95,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 99.5 },
+              { "color": "green", "value": 99.9 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 1 },
+      "id": 2,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        {
+          "expr": "(sum(rate(http_requests_total{status!~\"5..\"}[30d])) / sum(rate(http_requests_total[30d]))) * 100",
+          "legendFormat": "Availability",
+          "refId": "A"
+        }
+      ],
+      "title": "API Availability SLO (99.9%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Target: 95% of queries resolved under 500ms",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 400 },
+              { "color": "red", "value": 500 }
+            ]
+          },
+          "unit": "ms"
+        }
+      },
+      "gridPos": { "h": 5, "w": 5, "x": 4, "y": 1 },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(graphql_query_duration_seconds_bucket[5m])) by (le)) * 1000",
+          "legendFormat": "P95 Latency",
+          "refId": "A"
+        }
+      ],
+      "title": "API P95 Latency SLO (<500ms)",
+      "type": "stat"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Target: Ingestion lag <= 2 ledgers (< 10 seconds) behind network tip",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 2 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 5, "x": 9, "y": 1 },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        {
+          "expr": "stellar_network_latest_ledger - indexer_last_processed_ledger_sequence",
+          "legendFormat": "Ledgers Behind",
+          "refId": "A"
+        }
+      ],
+      "title": "Ingestion Lag SLO (<2 Ledgers)",
+      "type": "stat"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Target: >= 99.99% successful ingestion cycles without unrecoverable errors",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "max": 100,
+          "min": 99,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 99.9 },
+              { "color": "green", "value": 99.99 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 5, "w": 5, "x": 14, "y": 1 },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        {
+          "expr": "(sum(rate(indexer_ledgers_processed_total[30d])) / (sum(rate(indexer_ledgers_processed_total[30d])) + sum(rate(indexer_errors_total[30d])))) * 100",
+          "legendFormat": "Success Rate",
+          "refId": "A"
+        }
+      ],
+      "title": "Ingestion Reliability SLO (99.99%)",
+      "type": "stat"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Target: Dead Letter Queue depth must be zero",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 5, "x": 19, "y": 1 },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
+        {
+          "expr": "indexer_dlq_depth",
+          "legendFormat": "DLQ Depth",
+          "refId": "A"
+        }
+      ],
+      "title": "Dead Letter Queue SLO (0 Depth)",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
+      "id": 7,
+      "title": "API Availability & Error Budget Burn Rate",
+      "type": "row"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Tracks actual availability against 99.9% SLO threshold over time",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 98,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 99.9 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 },
+      "id": 8,
+      "options": {
+        "legend": { "calcs": ["min", "max", "last"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "expr": "(sum(rate(http_requests_total{status!~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))) * 100",
+          "legendFormat": "Current 5m Availability SLI",
+          "refId": "A"
+        },
+        {
+          "expr": "(sum(rate(http_requests_total{status!~\"5..\"}[1h])) / sum(rate(http_requests_total[1h]))) * 100",
+          "legendFormat": "1h Rolling Availability",
+          "refId": "B"
+        }
+      ],
+      "title": "API Availability SLI Compliance",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Multi-window burn rate: 1.0 means consuming error budget at exact acceptable pace. >14.4x consumes 2% in 1 hour.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 6 },
+              { "color": "red", "value": 14.4 }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 7 },
+      "id": 9,
+      "options": {
+        "legend": { "calcs": ["max", "last"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "(1 - (sum(rate(http_requests_total{status!~\"5..\"}[1h])) / sum(rate(http_requests_total[1h])))) / (1 - 0.999)",
+          "legendFormat": "1h Burn Rate (Page >= 14.4)",
+          "refId": "A"
+        },
+        {
+          "expr": "(1 - (sum(rate(http_requests_total{status!~\"5..\"}[6h])) / sum(rate(http_requests_total[6h])))) / (1 - 0.999)",
+          "legendFormat": "6h Burn Rate (Ticket >= 6.0)",
+          "refId": "B"
+        },
+        {
+          "expr": "(1 - (sum(rate(http_requests_total{status!~\"5..\"}[3d])) / sum(rate(http_requests_total[3d])))) / (1 - 0.999)",
+          "legendFormat": "3d Burn Rate (Ticket >= 1.0)",
+          "refId": "C"
+        }
+      ],
+      "title": "Error Budget Multi-Window Burn Rates",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 },
+      "id": 10,
+      "title": "API Latency & Query Performance SLO",
+      "type": "row"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "GraphQL query latency percentiles vs 500ms P95 SLO target",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 500 },
+              { "color": "red", "value": 1500 }
+            ]
+          },
+          "unit": "ms"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "id": 11,
+      "options": {
+        "legend": { "calcs": ["mean", "max", "last"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(graphql_query_duration_seconds_bucket[5m])) by (le)) * 1000",
+          "legendFormat": "P50 Latency",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(graphql_query_duration_seconds_bucket[5m])) by (le)) * 1000",
+          "legendFormat": "P95 Latency (SLO < 500ms)",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(graphql_query_duration_seconds_bucket[5m])) by (le)) * 1000",
+          "legendFormat": "P99 Latency (SLO < 1500ms)",
+          "refId": "C"
+        }
+      ],
+      "title": "GraphQL Query Execution Latency Percentiles",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Queries breaching warning (>1000ms) or critical (>5000ms) performance thresholds",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "bars", "fillOpacity": 80, "lineWidth": 1 },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "id": 12,
+      "options": {
+        "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "rate(db_slow_queries_total[5m])",
+          "legendFormat": "Slow Database Queries (>100ms)",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(graphql_slow_queries_total{severity=\"warn\"}[5m])",
+          "legendFormat": "Slow GraphQL Queries (>1000ms)",
+          "refId": "B"
+        },
+        {
+          "expr": "rate(graphql_slow_queries_total{severity=\"critical\"}[5m])",
+          "legendFormat": "Critical Slow GraphQL Queries (>5000ms)",
+          "refId": "C"
+        }
+      ],
+      "title": "Slow Query Threshold Breaches",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 24 },
+      "id": 13,
+      "title": "Indexer Ingestion Freshness & Throughput SLO",
+      "type": "row"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Number of ledgers the indexer is lagging behind the Stellar network tip",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineWidth": 2,
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 2 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 25 },
+      "id": 14,
+      "options": {
+        "legend": { "calcs": ["max", "last"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "stellar_network_latest_ledger - indexer_last_processed_ledger_sequence",
+          "legendFormat": "Current Ledger Lag (SLO <= 2)",
+          "refId": "A"
+        }
+      ],
+      "title": "Indexer Ingestion Freshness & Lag",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Cycle duration: time required to poll, process, and write one ledger batch to Postgres",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 25 },
+      "id": 15,
+      "options": {
+        "legend": { "calcs": ["mean", "p95", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(indexer_cycle_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "P95 Ingestion Cycle Duration",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(indexer_cycle_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "P99 Ingestion Cycle Duration (SLO < 5s)",
+          "refId": "B"
+        }
+      ],
+      "title": "Ingestion Cycle Latency",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 33 },
+      "id": 16,
+      "title": "Ingestion Reliability & DLQ Management SLO",
+      "type": "row"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Items waiting in Dead Letter Queue (DLQ) requiring manual or automated retry",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 25, "lineWidth": 2 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 34 },
+      "id": 17,
+      "options": {
+        "legend": { "calcs": ["max", "last"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "indexer_dlq_depth",
+          "legendFormat": "DLQ Depth (Target: 0)",
+          "refId": "A"
+        },
+        {
+          "expr": "increase(indexer_dlq_enqueued_total[1h])",
+          "legendFormat": "New Items Enqueued / Hour",
+          "refId": "B"
+        }
+      ],
+      "title": "Dead Letter Queue (DLQ) Status",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Circuit breaker state: 0=CLOSED (healthy), 1=HALF_OPEN (testing), 2=OPEN (tripped)",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            { "options": { "0": { "color": "green", "text": "CLOSED (Normal)" } }, "type": "value" },
+            { "options": { "1": { "color": "yellow", "text": "HALF-OPEN (Probing)" } }, "type": "value" },
+            { "options": { "2": { "color": "red", "text": "OPEN (Tripped)" } }, "type": "value" }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 2 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 34 },
+      "id": 18,
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "expr": "indexer_circuit_breaker_state",
+          "legendFormat": "Circuit Breaker State",
+          "refId": "A"
+        }
+      ],
+      "title": "Indexer Circuit Breaker Status",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Ingestion errors labelled by failure type",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "bars", "fillOpacity": 60, "lineWidth": 1 },
+          "unit": "errors/sec"
+        }
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 34 },
+      "id": 19,
+      "options": {
+        "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "sum by (type) (rate(indexer_errors_total[5m]))",
+          "legendFormat": "Error: {{type}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (entity) (rate(indexer_validation_failures_total[5m]))",
+          "legendFormat": "Validation Failure: {{entity}}",
+          "refId": "B"
+        }
+      ],
+      "title": "Ingestion Error Breakdown",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 42 },
+      "id": 20,
+      "title": "Infrastructure & Database Health SLO",
+      "type": "row"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "PostgreSQL connection pool active connections vs maximum pool size",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 20, "lineWidth": 2 },
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 85 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 43 },
+      "id": 21,
+      "options": {
+        "legend": { "calcs": ["mean", "max", "last"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "(db_pool_active_connections / db_pool_max_connections) * 100",
+          "legendFormat": "PostgreSQL Pool Utilization % (Target < 80%)",
+          "refId": "A"
+        }
+      ],
+      "title": "Database Connection Pool Utilization",
+      "type": "timeseries"
+    },
+    {
+      "datasource": "${datasource}",
+      "description": "Database write latency percentiles labelled by table (ledgers, transactions, operations)",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 100 }
+            ]
+          },
+          "unit": "ms"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 43 },
+      "id": 22,
+      "options": {
+        "legend": { "calcs": ["mean", "p95", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (table, le) (rate(indexer_db_write_duration_seconds_bucket[5m]))) * 1000",
+          "legendFormat": "P95 DB Write: {{table}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Database Write Duration by Table (P95)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["slo", "operations", "production", "stellar-analytics"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": true, "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"],
+    "time_options": ["1h", "6h", "12h", "24h", "7d", "30d"]
+  },
+  "timezone": "browser",
+  "title": "Operational Service Level Objectives (SLOs) Dashboard",
+  "uid": "operational-slo-dashboard",
+  "version": 1
+}
