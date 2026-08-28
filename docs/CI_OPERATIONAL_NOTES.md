@@ -13,7 +13,7 @@ The main CI workflow runs on every push and pull request to `main` and `develop`
 - Uploads coverage report to artifacts
 - **Runtime**: ~10 minutes
 
-#### Migration Integration Tests Job
+#### Migration Integration Tests Job.
 - Runs database migration tests
 - Requires PostgreSQL service
 - **Runtime**: ~10 minutes
