@@ -183,12 +183,130 @@ GitHub Actions workflow `.github/workflows/database-migrations.yml` validates:
 - re-apply (`db:migrate`)
 - schema_version table presence and version correctness
 
+## Schema Migration Operational Checklist
+
+Follow this checklist for every database schema change from local development through production deployment.
+
+### Phase 1: Pre-Migration Planning & Validation (Local & Staging)
+
+- [ ] **1.1 Backward Compatibility Review (Expand & Contract)**
+  - Ensure all schema changes follow the *expand-and-contract* paradigm.
+  - New columns must either allow `NULL` or specify a valid `DEFAULT` value so that existing application containers continue writing without error.
+  - Do not drop columns, rename active tables/columns, or introduce non-null constraints without defaults in a single step.
+  - Ensure foreign key constraints do not cascade delete or block hot ingestion rows.
+
+- [ ] **1.2 Concurrency & Lock Contention Assessment**
+  - Verify index additions on large tables (`transactions`, `operations`, `ledgers`) do not take exclusive table locks that block active ingestion.
+  - In PostgreSQL, verify if `CONCURRENTLY` is required for index creations.
+  - Review table alters for table rewrites or heavy access locks. Configure session-level safety guards where appropriate:
+    ```sql
+    SET lock_timeout = '3s';
+    SET statement_timeout = '60s';
+    ```
+
+- [ ] **1.3 Version Bumping & Documentation**
+  - Determine semantic version impact:
+    - **MAJOR** (`2.0.0`): Breaking change (table/column dropped or renamed).
+    - **MINOR** (`1.1.0`): Backward-compatible additive change (new table, nullable column, index).
+    - **PATCH** (`1.0.1`): Non-schema fix (comments, minor index re-alignment).
+  - Update `CODE_SCHEMA_VERSION` and `CODE_SCHEMA_DESCRIPTION` in `packages/indexer/src/database/schema-version.ts`.
+  - Update `packages/indexer/src/database/schema.sql` to keep the reference baseline current.
+
+- [ ] **1.4 Bidirectional Reversibility Verification**
+  - Verify both forward (`up`) and backward (`down`) migrations execute cleanly in local isolation:
+    ```bash
+    pnpm db:migrate
+    pnpm db:migrate:down
+    pnpm db:migrate
+    ```
+  - Confirm `exports.down` completely removes added columns, tables, types, or indexes without leaving orphaned artifacts.
+
+- [ ] **1.5 Query Plan Analysis**
+  - Audit database access patterns with the explain script:
+    ```bash
+    sh scripts/database/analyze-query-plans.sh
+    ```
+  - Verify new queries utilize expected index scans rather than sequential scans.
+
+---
+
+### Phase 2: Execution & Deployment (Production / Staging)
+
+- [ ] **2.1 Pre-Flight Backup & Snapshot Verification**
+  - Confirm that a recent automated daily backup exists, or trigger an on-demand snapshot:
+    ```bash
+    pnpm backup:run
+    pnpm backup:verify
+    ```
+  - Confirm WAL archiving is functioning normally (see `docs/backup-disaster-recovery.md`).
+
+- [ ] **2.2 Maintenance Window & Operator Notification**
+  - Post migration advisory to `#ops-alerts` detailing:
+    - Target environment (Staging / Production).
+    - Migration filename and description.
+    - Expected duration and lock requirements.
+    - Designated operator handling rollback if needed.
+
+- [ ] **2.3 Execution Sequencing**
+  - **Additive Migrations (Expand)**: Run `pnpm db:migrate` **before** rolling out new application container images.
+  - **Breaking Multi-Phase Migrations**: Deploy dual-write compatible application -> run data backfill -> deploy code switching to new schema -> run contract migration.
+
+- [ ] **2.4 Migration Execution**
+  - Run the migration runner against target database:
+    ```bash
+    export DATABASE_URL="postgresql://user:pass@db.prod:5432/stellar_analytics"
+    pnpm db:migrate
+    ```
+  - Verify entry in the `pgmigrations` audit table:
+    ```sql
+    SELECT id, name, run_on FROM pgmigrations ORDER BY id DESC LIMIT 5;
+    ```
+
+- [ ] **2.5 Schema Version Gate Confirmation**
+  - Query `schema_version` to verify current recorded version:
+    ```sql
+    SELECT version, description, applied_at FROM schema_version ORDER BY applied_at DESC LIMIT 1;
+    ```
+  - Restart or boot indexer and confirm `SchemaVersionManager.checkCompatibility()` completes with `compatible: true` and no fatal exit.
+
+---
+
+### Phase 3: Post-Migration Monitoring & Rollback Protocol
+
+- [ ] **3.1 Real-Time Telemetry Audit**
+  - Inspect `GET /metrics` for database query error spikes and latency degradation.
+  - Check `GET /metrics/queries` for slow queries (>100ms) against new tables or modified indexes.
+  - Verify indexer ingestion metrics:
+    - `indexer_errors_total` must remain flat.
+    - `indexer_dlq_depth` must remain at 0.
+    - `indexer_last_processed_ledger_sequence` must advance normally.
+
+- [ ] **3.2 Rollback Protocol**
+  - **Scenario A: Reversible non-destructive regression**:
+    Rollback the migration immediately:
+    ```bash
+    pnpm db:migrate:down
+    ```
+  - **Scenario B: Data corruption or irreversible schema change**:
+    1. Stop indexer ingestion:
+       ```bash
+       docker compose stop indexer
+       ```
+    2. Restore database from pre-migration backup (see `docs/backup-disaster-recovery.md`):
+       ```bash
+       docker compose run --rm postgres-backup /bin/sh /scripts/restore-backup.sh <pre_migration_backup.sql.gz>
+       ```
+    3. Verify data consistency and resume services.
+
+---
+
 ## Operational Notes
 
 - Do not edit applied migration files in production; create a new migration instead.
 - Prefer additive migrations (new columns/tables) over destructive changes.
-- Take a backup before production migrations (see `docs/backup-disaster-recovery.md`).
-- Keep `schema.sql` as a human-readable reference only; migrations are the source of truth.
+- Always execute Phase 1 validation (including `pnpm db:migrate:down`) locally before opening a pull request.
+- Take a verified backup before production migrations (see `docs/backup-disaster-recovery.md` and Step 2.1).
+- Keep `schema.sql` as a human-readable reference only; migrations in `packages/indexer/migrations/` are the authoritative source of truth.
 - Bump `CODE_SCHEMA_VERSION` and `CODE_SCHEMA_DESCRIPTION` when creating a new migration.
-- If a fatal schema version incompatibility is detected, the indexer will refuse to
-  start with a clear error message explaining what needs to be done.
+- If a fatal schema version incompatibility is detected, the indexer will refuse to start with a clear error message explaining what needs to be done.
+
