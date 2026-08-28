@@ -15,13 +15,15 @@
     ],
     "moduleNameMapper": {
       "^(\\.\\.?/.*)\\.js$": "$1",
-      "^@stellar-analytics/shared$": "<rootDir>/../shared/src/index.ts"
+      "^@stellar-analytics/shared$": "<rootDir>/../shared/src/index.ts",
+      "^@stellar/stellar-sdk$": "<rootDir>/node_modules/@stellar/stellar-sdk"
     },
     "transform": {
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "useESM": true
+          "useESM": true,
+          "diagnostics": false
         }
       ]
     }

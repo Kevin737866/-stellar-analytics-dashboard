@@ -2,6 +2,10 @@
   "name": "stellar-analytics-dashboard",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=9"
+  },
   "packageManager": "pnpm@9.12.0",
   "scripts": {
     "dev": "concurrently \"pnpm --filter @stellar-analytics/indexer dev\" \"pnpm --filter @stellar-analytics/api dev\" \"pnpm --filter @stellar-analytics/frontend dev\"",

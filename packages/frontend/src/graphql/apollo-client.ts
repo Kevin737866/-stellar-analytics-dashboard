@@ -85,12 +85,18 @@ const wsLink = new GraphQLWsLink(wsClient);
 
 const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
   if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path }) =>
+    graphQLErrors.forEach(({ message, locations, path, extensions }) => {
+      // Issue #340 – prefer the classified userMessage in the log so console
+      // output is as readable as what the UI shows. Fall back to raw message.
+      const displayMessage =
+        (extensions?.userMessage as string | undefined) ?? message;
+      const code = (extensions?.code as string | undefined) ?? 'UNKNOWN';
+
       console.warn(
-        `[GraphQL error] op=${operation.operationName} path=${String(path)} msg=${message}`,
+        `[GraphQL error] op=${operation.operationName} code=${code} path=${String(path)} msg=${displayMessage}`,
         locations
-      )
-    );
+      );
+    });
   }
   if (networkError) {
     console.warn(`[Network error] op=${operation.operationName}:`, networkError);

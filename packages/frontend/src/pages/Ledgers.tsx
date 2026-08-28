@@ -21,6 +21,7 @@ import { MetricCard } from '@/components/MetricCard';
 import { useFilterSort } from '@/hooks/useFilterSort';
 import type { FilterPreset } from '@/components/FilterBar';
 import { ledgerFiltersSchema } from '@/lib/validation';
+import { ApiErrorMessage } from '@/components/ApiErrorMessage';
 
 // ── filter defaults ───────────────────────────────────────────────────────────
 
@@ -75,7 +76,7 @@ export function Ledgers() {
 
   const after = searchParams.get('after') ?? undefined;
 
-  const { data, loading, fetchMore, refetch } = useQuery(LEDGERS_QUERY, {
+  const { data, loading, error, fetchMore, refetch } = useQuery(LEDGERS_QUERY, {
     variables: {
       first: 20,
       after,
@@ -328,6 +329,9 @@ export function Ledgers() {
       </FilterBar>
 
       {/* Table */}
+      {error ? (
+        <ApiErrorMessage error={error} onRetry={() => refetch()} />
+      ) : (
       <DataTable
         caption="Ledgers"
         columns={columns}
@@ -353,6 +357,7 @@ export function Ledgers() {
           })
         }
       />
+      )}
     </div>
   );
 }

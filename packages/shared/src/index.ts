@@ -5,4 +5,5 @@ export * from './types/account-events';
 
 // Export utilities
 export * from './utils/stellar';
+export * from './utils/stroop';
 export * from './utils/validation';

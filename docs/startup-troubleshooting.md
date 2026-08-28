@@ -181,7 +181,7 @@ chmod +x .husky/*
 
 ### Node version mismatch
 
-The project requires Node.js **18 or higher**. Using an older version causes build and runtime errors.
+The project requires Node.js **18 or higher** (Node **20 LTS** recommended to match CI). Using an older version causes build and runtime errors. See [`node-versions.md`](./node-versions.md) for the full policy.
 
 ```bash
 node --version   # must be ≥ 18

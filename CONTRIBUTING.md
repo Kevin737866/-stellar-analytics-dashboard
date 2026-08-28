@@ -6,7 +6,7 @@ Thank you for your interest in contributing to the Stellar Analytics Dashboard! 
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 18+ (Node 20 recommended — see [`docs/node-versions.md`](docs/node-versions.md))
 - Docker & Docker Compose
 - pnpm (recommended) or npm
 - Git
@@ -277,6 +277,10 @@ pnpm db:migrate
 Each service area has a designated owning team. GitHub automatically requests their review via [`.github/CODEOWNERS`](.github/CODEOWNERS) whenever a PR touches their files.
 
 See [`docs/code-ownership.md`](docs/code-ownership.md) for the full ownership table, per-area acceptance criteria, and escalation guidelines.
+
+## Issue taxonomy
+
+Use the labels, areas, and title conventions in [`docs/contributor-issue-taxonomy.md`](docs/contributor-issue-taxonomy.md) when filing or triaging issues. Every new feature request starts with `needs-triage` and must identify affected monorepo areas.
 
 ## 📦 Dependency Updates
 

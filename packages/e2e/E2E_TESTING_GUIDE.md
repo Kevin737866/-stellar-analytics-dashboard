@@ -63,13 +63,33 @@ packages/e2e/
 │   ├── search.spec.ts            # Search functionality tests
 │   ├── details.spec.ts           # Detail page tests
 │   ├── responsive.spec.ts        # Responsive design tests
-│   └── performance.spec.ts       # Performance tests
+│   ├── performance.spec.ts       # Performance tests
+│   └── visual-regression.spec.ts # Visual regression tests
 ├── package.json
 ├── tsconfig.json
 └── README.md
 ```
 
 ## Test Coverage
+
+<!-- e2e-test-count: 68 -->
+<!-- e2e-suite-count: 8 -->
+
+### Test inventory
+
+| Spec file | Tests |
+|-----------|------:|
+| `auth.spec.ts` | 7 |
+| `dashboard.spec.ts` | 9 |
+| `data-visualization.spec.ts` | 9 |
+| `search.spec.ts` | 4 |
+| `details.spec.ts` | 6 |
+| `responsive.spec.ts` | 7 |
+| `performance.spec.ts` | 6 |
+| `visual-regression.spec.ts` | 20 |
+| **Total** | **68** |
+
+The counts above are verified by `indexer/src/__tests__/e2e-test-counts.test.ts`. Update this table whenever you add or remove Playwright tests.
 
 ### 1. **Authentication Tests** (`auth.spec.ts`)
 - ✅ Login form display

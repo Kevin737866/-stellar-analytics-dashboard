@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import { TRANSACTION_QUERY } from '@/graphql/queries';
+import { ApiErrorMessage } from '@/components/ApiErrorMessage';
 
 interface Operation {
   id: string;
@@ -214,10 +215,7 @@ export function TransactionDetail() {
           <ArrowLeft className="h-4 w-4" />
           Back to Transactions
         </button>
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-semibold text-destructive mb-2">Transaction not found</h2>
-          <p className="text-muted-foreground">{error.message}</p>
-        </div>
+        <ApiErrorMessage error={error} onRetry={() => navigate(0)} />
       </div>
     );
   }

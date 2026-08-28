@@ -21,6 +21,7 @@ import {
 
 import { ACCOUNT_QUERY, ACCOUNT_METRICS_QUERY, TRANSACTIONS_QUERY } from '@/graphql/queries';
 import { MetricCard } from '@/components/MetricCard';
+import { ApiErrorMessage } from '@/components/ApiErrorMessage';
 
 interface AccountData {
   account: {
@@ -234,10 +235,7 @@ export function AccountDetail() {
           <ArrowLeft className="h-4 w-4" />
           Back to Accounts
         </button>
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-semibold text-destructive mb-2">Account not found</h2>
-          <p className="text-muted-foreground">{accountError.message}</p>
-        </div>
+        <ApiErrorMessage error={accountError} onRetry={() => navigate(0)} />
       </div>
     );
   }

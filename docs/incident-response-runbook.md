@@ -1403,13 +1403,14 @@ curl -X POST http://localhost:3001/backfill \
 | Document | Location | Content |
 |----------|----------|---------|
 | Incident Drill Log | `docs/operations/incident-drills.md` | Backup restore, PITR, and restart drill evidence |
+| Operational SLO Dashboards | `docs/operational-slo-dashboards.md` | Core SLO targets, error budget policies, Grafana dashboard |
 | Error Handling & Logging | `docs/error-handling-and-logging.md` | Winston config, log levels, GraphQL error handling |
 | Backup & Disaster Recovery | `docs/backup-disaster-recovery.md` | Backup strategy, PITR, restore procedures |
 | Query Performance | `docs/query-performance.md` | Index strategy, slow query monitoring, caching |
 | GraphQL Query Limits | `docs/graphql-query-limits.md` | Depth limiting, complexity analysis |
 | CORS Configuration | `docs/cors.md` | CORS settings by environment |
 | Security Headers | `docs/security-headers.md` | Helmet configuration |
-| Database Migrations | `docs/database-migrations.md` | Migration workflow, rollback |
+| Database Migrations | `docs/database-migrations.md` | Migration workflow, checklist, rollback |
 | Indexer Alerting | `indexer/ALERTING.md` | Alert configuration, troubleshooting |
 | Indexer Backfill | `indexer/BACKFILL.md` | Backfill CLI, parallel processing |
 | Caching Strategy | `CACHING.md` | Redis cache TTLs, monitoring |

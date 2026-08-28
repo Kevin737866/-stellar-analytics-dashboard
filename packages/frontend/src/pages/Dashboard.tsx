@@ -11,6 +11,7 @@ import { LedgerTimelineChart } from '@/components/LedgerTimelineChart';
 import { NetworkChart } from '@/components/NetworkChart';
 import { RecentTransactions } from '@/components/RecentTransactions';
 import { TopAssets } from '@/components/TopAssets';
+import { ApiErrorMessage } from '@/components/ApiErrorMessage';
 
 interface StatsData {
   stats: {
@@ -87,10 +88,11 @@ export function Dashboard() {
 
   if (error) {
     return (
-      <div className="text-center py-12 border border-destructive/20 bg-destructive/5 rounded-xl">
-        <h2 className="text-xl font-bold text-destructive mb-2">Network Sync Error</h2>
-        <p className="text-muted-foreground">{error.message}</p>
-      </div>
+      <ApiErrorMessage
+        error={error}
+        onRetry={() => refetch()}
+        className="min-h-[400px]"
+      />
     );
   }
 

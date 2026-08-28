@@ -34,6 +34,7 @@ import {
   extractTraceId,
   getTraceResponseHeader,
 } from './utils/tracer';
+import { formatGraphQLError, QueryTooComplexError } from './utils/resolver-error';
 import { verify } from 'jsonwebtoken';
 
 dotenv.config();
@@ -589,7 +590,7 @@ class ApiServer {
               });
 
               if (complexity > MAX_QUERY_COMPLEXITY) {
-                throw new Error(
+                throw new QueryTooComplexError(
                   `Query complexity ${complexity} exceeds the maximum allowed complexity of ${MAX_QUERY_COMPLEXITY}. ` +
                     `Reduce the number of requested fields or lower the pagination limit.`
                 );
@@ -715,6 +716,9 @@ class ApiServer {
       persistedQueries: {
         cache: new Map<string, string>(),
       },
+      // Issue #340 – classify errors and attach user-friendly messages before
+      // sending them to the client. Internal details stay in server logs only.
+      formatError: formatGraphQLError,
     });
   }
 

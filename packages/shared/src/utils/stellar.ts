@@ -1,5 +1,6 @@
 import { Asset, OperationType } from '../types/stellar';
 import { Horizon } from '@stellar/stellar-sdk';
+import { AssetCodeSchema, AddressSchema } from './validation';
 
 /**
  * Format asset to a standardized string representation
@@ -12,21 +13,43 @@ export function formatAsset(asset: Asset): string {
 }
 
 /**
- * Parse asset string into Asset object
+ * Parse asset string into Asset object.
+ *
+ * Accepts `XLM`, `native`, or `CODE:ISSUER` where CODE is 1–12 alphanumeric
+ * characters and ISSUER is a valid Stellar account address (G…).
  */
 export function parseAsset(assetString: string): Asset {
-  if (assetString === 'XLM' || assetString === 'native') {
+  const trimmed = assetString.trim();
+
+  if (!trimmed) {
+    throw new Error('Invalid asset format: empty string');
+  }
+
+  if (trimmed === 'XLM' || trimmed === 'native') {
     return {
       asset_type: 'native',
       native: true,
     };
   }
-  
-  const [code, issuer] = assetString.split(':');
+
+  const colonIndex = trimmed.indexOf(':');
+  if (colonIndex === -1 || trimmed.indexOf(':', colonIndex + 1) !== -1) {
+    throw new Error(`Invalid asset format: ${assetString}`);
+  }
+
+  const code = trimmed.slice(0, colonIndex);
+  const issuer = trimmed.slice(colonIndex + 1);
+
   if (!code || !issuer) {
     throw new Error(`Invalid asset format: ${assetString}`);
   }
-  
+
+  AssetCodeSchema.parse(code);
+  if (!/^[A-Za-z0-9]+$/.test(code)) {
+    throw new Error(`Invalid asset code: ${code}`);
+  }
+  AddressSchema.parse(issuer);
+
   return {
     asset_type: code.length <= 4 ? 'credit_alphanum4' : 'credit_alphanum12',
     asset_code: code,
@@ -34,23 +57,8 @@ export function parseAsset(assetString: string): Asset {
   };
 }
 
-/**
- * Convert stroops to XLM
- */
-export function stroopsToXlm(stroops: string | number): string {
-  const stroopsNum = typeof stroops === 'string' ? BigInt(stroops) : BigInt(stroops);
-  const xlm = Number(stroopsNum) / 10000000;
-  return xlm.toFixed(7);
-}
-
-/**
- * Convert XLM to stroops
- */
-export function xlmToStroops(xlm: string | number): string {
-  const xlmNum = typeof xlm === 'string' ? parseFloat(xlm) : xlm;
-  const stroops = Math.floor(xlmNum * 10000000);
-  return stroops.toString();
-}
+export * from './stroop';
+import { stroopsToXlm } from './stroop';
 
 /**
  * Format balance for display
@@ -58,7 +66,9 @@ export function xlmToStroops(xlm: string | number): string {
 export function formatBalance(balance: string, asset?: Asset): string {
   if (!asset || asset.asset_type === 'native') {
     const xlm = stroopsToXlm(balance);
-    return `${parseFloat(xlm).toLocaleString()} XLM`;
+    const [whole, frac] = xlm.split('.');
+    const formattedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return `${formattedWhole}.${frac} XLM`;
   }
   
   const numBalance = parseFloat(balance);

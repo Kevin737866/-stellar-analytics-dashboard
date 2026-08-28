@@ -72,6 +72,9 @@ test.describe('Feature Name', () => {
 | `tests/details.spec.ts` | Detail page tests |
 | `tests/responsive.spec.ts` | Mobile/tablet tests |
 | `tests/performance.spec.ts` | Performance tests |
+| `tests/visual-regression.spec.ts` | Visual regression tests |
+
+**68 Playwright tests** across 8 spec files — see the [test inventory](./E2E_TESTING_GUIDE.md#test-inventory) in `E2E_TESTING_GUIDE.md`.
 
 ## Test Capabilities
 

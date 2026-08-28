@@ -2,6 +2,7 @@
   "name": "@stellar-analytics/shared",
   "version": "1.0.0",
   "description": "Shared types and utilities for Stellar Analytics Dashboard",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -14,7 +15,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "node --test src/tests/*.test.ts"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "^11.0.0",

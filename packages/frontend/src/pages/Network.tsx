@@ -17,11 +17,12 @@ import { Activity, Zap, ShieldCheck, Clock, RefreshCcw } from 'lucide-react';
 import { MetricCard } from '@/components/MetricCard';
 import { ChartTooltip } from '@/components/ChartTooltip';
 import { ChartLegend } from '@/components/ChartLegend';
+import { ApiErrorMessage } from '@/components/ApiErrorMessage';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 export function Network() {
-  const { data, loading, refetch } = useQuery(NETWORK_METRICS_QUERY, {
+  const { data, loading, error, refetch } = useQuery(NETWORK_METRICS_QUERY, {
     variables: { timeRange: { last: '24h' } },
     pollInterval: 10000,
     notifyOnNetworkStatusChange: true,
@@ -74,6 +75,10 @@ export function Network() {
         </div>
       </div>
     );
+
+  if (error) {
+    return <ApiErrorMessage error={error} onRetry={() => refetch()} className="min-h-[400px]" />;
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-700">

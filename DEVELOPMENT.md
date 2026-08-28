@@ -23,8 +23,10 @@ Everything a new developer needs to run the Stellar Analytics Dashboard on their
 
 | Tool | Minimum version | How to check |
 |------|----------------|--------------|
-| Node.js | 18 | `node --version` |
+| Node.js | 18 (20 recommended) | `node --version` |
 | pnpm | 9 | `pnpm --version` |
+
+See [`docs/node-versions.md`](docs/node-versions.md) for the full version policy, CI alignment, and troubleshooting.
 | Docker Desktop | any recent | `docker --version` |
 | Docker Compose | v2 (bundled with Desktop) | `docker compose version` |
 | Git | any | `git --version` |
@@ -422,6 +424,7 @@ resolved.
 | Document | What it covers |
 |----------|----------------|
 | `CONTRIBUTING.md` | Branch strategy, commit conventions, PR checklist |
+| `docs/node-versions.md` | Supported Node.js and pnpm versions |
 | `CACHING.md` | Redis TTL strategy and cache-aside pattern |
 | `docs/database-migrations.md` | Migration workflow, rollback, CI |
 | `docs/query-performance.md` | Indexes, slow-query monitoring, DataLoader |

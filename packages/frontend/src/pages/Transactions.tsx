@@ -11,6 +11,7 @@ import { useFilterSort } from '@/hooks/useFilterSort';
 import type { FilterPreset } from '@/components/FilterBar';
 import { transactionFiltersSchema } from '@/lib/validation';
 import { clsx } from 'clsx';
+import { ApiErrorMessage } from '@/components/ApiErrorMessage';
 
 // ── filter defaults ──────────────────────────────────────────────────────────
 
@@ -154,7 +155,7 @@ export function Transactions() {
 
   // ── main paginated query ───────────────────────────────────────────────────
 
-  const { data, loading, refetch } = useQuery(TRANSACTIONS_QUERY, {
+  const { data, loading, error, refetch } = useQuery(TRANSACTIONS_QUERY, {
     variables: {
       first: 20,
       after,
@@ -559,6 +560,9 @@ export function Transactions() {
       </FilterBar>
 
       {/* ── Data table ───────────────────────────────────────────────────── */}
+      {error ? (
+        <ApiErrorMessage error={error} onRetry={() => refetch()} />
+      ) : (
       <DataTable
         caption="Transactions"
         columns={columns}
@@ -584,6 +588,7 @@ export function Transactions() {
           });
         }}
       />
+      )}
     </div>
   );
 }

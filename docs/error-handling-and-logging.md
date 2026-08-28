@@ -85,6 +85,58 @@ Logged at `warn` level when a GraphQL operation takes longer than 1000ms:
 Slow GraphQL query detected { operation, duration }
 ```
 
+## Error Classification and User-Friendly Messages (issue #340)
+
+All GraphQL errors are processed by the `formatGraphQLError` hook before being sent to clients.
+Each error is enriched with two additional `extensions` fields:
+
+| Field | Description |
+|-------|-------------|
+| `code` | Stable error category (see table below) |
+| `userMessage` | Short, non-technical message safe to display in the UI |
+
+### Error Codes
+
+| Code | Meaning | HTTP equivalent |
+|------|---------|-----------------|
+| `INTERNAL_ERROR` | Unexpected server failure | 500 |
+| `NOT_FOUND` | Requested resource does not exist | 404 |
+| `UNAUTHENTICATED` | Request requires a valid login | 401 |
+| `FORBIDDEN` | Authenticated user lacks permission | 403 |
+| `VALIDATION_ERROR` | GraphQL schema or query validation failed | 400 |
+| `BAD_USER_INPUT` | Mutation/query argument is invalid | 400 |
+| `RATE_LIMITED` | Client exceeded the request rate limit | 429 |
+| `SERVICE_UNAVAILABLE` | Upstream service (Horizon) is temporarily down | 503 |
+| `TIMEOUT` | Operation exceeded its time budget | 504 |
+| `QUERY_TOO_COMPLEX` | Query depth/complexity limit exceeded | 400 |
+| `PERSISTED_QUERY_NOT_FOUND` | APQ hash not in cache | 200 (APQ re-send) |
+
+### Behaviour by environment
+
+| Environment | `message` field | `extensions.internalMessage` |
+|-------------|----------------|------------------------------|
+| Development | Original technical message | Present when it differs from `message` |
+| Production | `userMessage` (safe copy) | Absent |
+
+Sensitive fields (`stacktrace`, `exception`) are **always** stripped from client responses in both environments.
+
+### Frontend usage
+
+The `useApiError` hook (`packages/frontend/src/hooks/useApiError.ts`) extracts the `userMessage`
+and `code` from Apollo errors and exposes convenience flags:
+
+```typescript
+const { message, code, isUnauthenticated, isNotFound, isValidation, isServerError } =
+  useApiError(apolloError);
+```
+
+The `ApiErrorMessage` component (`packages/frontend/src/components/ApiErrorMessage.tsx`) renders
+a classified error with an appropriate icon, colour, and optional "Try again" button:
+
+```tsx
+if (error) return <ApiErrorMessage error={error} onRetry={refetch} />;
+```
+
 ## HTTP Error Handling
 
 ### Health Endpoint

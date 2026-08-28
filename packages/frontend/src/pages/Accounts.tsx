@@ -11,6 +11,7 @@ import type { FilterPreset } from '@/components/FilterBar';
 import { ValidationMessage } from '@/components/ValidationMessage';
 import { accountFiltersSchema } from '@/lib/validation';
 import { clsx } from 'clsx';
+import { ApiErrorMessage } from '@/components/ApiErrorMessage';
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -344,9 +345,7 @@ export function Accounts() {
 
       {/* Error */}
       {error && (
-        <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          Error loading accounts: {error.message}
-        </div>
+        <ApiErrorMessage error={error} onRetry={() => refetch()} />
       )}
 
       {/* Table */}
