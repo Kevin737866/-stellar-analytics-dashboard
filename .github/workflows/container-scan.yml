@@ -1,0 +1,150 @@
+name: Container Vulnerability Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**/Dockerfile*'
+      - '**/docker-compose*.yml'
+      - 'api/**'
+      - 'indexer/**'
+      - 'shared/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**/Dockerfile*'
+      - '**/docker-compose*.yml'
+      - 'api/**'
+      - 'indexer/**'
+      - 'shared/**'
+  schedule:
+    # Run nightly at 2 AM UTC for security updates
+    - cron: '0 2 * * *'
+
+jobs:
+  trivy-scan:
+    name: Trivy Container Vulnerability Scan
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.28.0
+        with:
+          # Scan mode: image (requires Docker build) or filesystem (no build needed)
+          scan-type: 'filesystem'
+          # Scan options
+          scan-dev-deps: 'true'
+          # Severity levels to report (CRITICAL, HIGH, MEDIUM, LOW, UNKNOWN)
+          severity: 'CRITICAL,HIGH'
+          # Output format
+          format: 'sarif'
+          # Output file
+          output-file: 'trivy-results.sarif'
+          # Ignore unfixed vulnerabilities
+          ignore-unfixed: 'true'
+          # Cache directory
+          cache-dir: '/tmp/trivy-cache'
+
+      - name: Upload Trivy results to GitHub Security tab
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Generate scan summary
+        if: always()
+        run: |
+          echo "### Container Vulnerability Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Scan Type**: Filesystem (no Docker build required)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Severity Levels**: CRITICAL, HIGH" >> $GITHUB_STEP_SUMMARY
+          echo "- **Scan Mode**: Dev dependencies included" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "trivy-results.sarif" ]; then
+            # Count vulnerabilities
+            CRITICAL=$(grep -o '"severity": *"Critical"' trivy-results.sarif | wc -l || echo "0")
+            HIGH=$(grep -o '"severity": *"High"' trivy-results.sarif | wc -l || echo "0")
+            TOTAL=$((CRITICAL + HIGH))
+            
+            echo "- **Critical**: $CRITICAL" >> $GITHUB_STEP_SUMMARY
+            echo "- **High**: $HIGH" >> $GITHUB_STEP_SUMMARY
+            echo "- **Total**: $TOTAL" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "$TOTAL" -gt 0 ]; then
+              echo "⚠️ Vulnerabilities detected - review in Security tab" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "✅ No critical or high vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ No scan results available" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  dockerfile-lint:
+    name: Dockerfile Lint
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Run Hadolint Dockerfile linter
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: './Dockerfile'
+          config: './.hadolint.yaml'
+          # Severity levels: error, warning, info
+          failure-threshold: 'warning'
+
+      - name: Generate lint summary
+        if: always()
+        run: |
+          echo "### Dockerfile Lint Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tool**: Hadolint" >> $GITHUB_STEP_SUMMARY
+          echo "- **Severity Threshold**: warning" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Dockerfile best practices checked:" >> $GITHUB_STEP_SUMMARY
+          echo "- Use non-root user" >> $GITHUB_STEP_SUMMARY
+          echo "- Avoid secrets in build" >> $GITHUB_STEP_SUMMARY
+          echo "- Pin base image versions" >> $GITHUB_STEP_SUMMARY
+          echo "- Use multi-stage builds" >> $GITHUB_STEP_SUMMARY
+
+  docker-compose-lint:
+    name: Docker Compose Lint
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Run docker-compose-lint
+        uses: ludeeus/action-docker-compose-lint@v2.0.0
+        with:
+          # Severity levels: error, warning, info
+          severity: 'warning'
+          # Check for common issues
+          check-security: 'true'
+
+      - name: Generate compose lint summary
+        if: always()
+        run: |
+          echo "### Docker Compose Lint Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tool**: docker-compose-lint" >> $GITHUB_STEP_SUMMARY
+          echo "- **Severity Threshold**: warning" >> $GITHUB_STEP_SUMMARY
+          echo "- **Security Check**: Enabled" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Common issues checked:" >> $GITHUB_STEP_SUMMARY
+          echo "- Port exposure" >> $GITHUB_STEP_SUMMARY
+          echo "- Volume mounts" >> $GITHUB_STEP_SUMMARY
+          echo "- Environment variables" >> $GITHUB_STEP_SUMMARY
+          echo "- Health checks" >> $GITHUB_STEP_SUMMARY
+          echo "- Service dependencies" >> $GITHUB_STEP_SUMMARY

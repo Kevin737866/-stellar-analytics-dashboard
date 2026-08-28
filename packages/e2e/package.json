@@ -16,6 +16,8 @@
     "test:visual:ci": "playwright test --project=visual-regression --reporter=list --reporter=junit",
     "test:flaky": "cross-env QUARANTINE_MODE=run-quarantined playwright test --project=flaky-detection --repeat-each=3",
     "test:flaky:ci": "cross-env QUARANTINE_MODE=run-quarantined playwright test --project=flaky-detection --repeat-each=3 --reporter=list --reporter=junit",
+    "test:smoke": "ts-node scripts/smoke-test.ts",
+    "test:smoke:ci": "cross-env CI=true ts-node scripts/smoke-test.ts",
     "flaky:promote": "ts-node scripts/promote-flaky.ts",
     "flaky:promote:dry": "ts-node scripts/promote-flaky.ts --dry-run",
     "codegen": "playwright codegen http://localhost:5173"
@@ -23,6 +25,7 @@
   "devDependencies": {
     "@playwright/test": "^1.40.0",
     "@types/node": "^20.10.0",
+    "chalk": "^4.1.2",
     "cross-env": "^7.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"

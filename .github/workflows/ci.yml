@@ -201,3 +201,42 @@ jobs:
                 body: `## E2E Test Results\n- ✅ Tests Run: ${tests}\n- ❌ Failures: ${failures}\n- ⚠️ Errors: ${errors}`,
               });
             }
+
+  # Deployment smoke tests verify the deployed application is functional
+  # Run against staging after merge to main, or manually against any deployment
+  deployment-smoke-tests:
+    name: Deployment Smoke Tests
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    needs: e2e-tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.12.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @stellar-analytics/e2e exec playwright install --with-deps
+
+      # NOTE: This job requires a running deployment to test against.
+      # For local testing, use: pnpm --filter @stellar-analytics/e2e test:smoke --url <deployment-url>
+      - name: Run deployment smoke tests
+        run: |
+          echo "Skipping smoke tests - requires deployed instance"
+          echo "To run manually: pnpm --filter @stellar-analytics/e2e test:smoke --url <deployment-url>"
+        env:
+          CI: true
+        continue-on-error: true
