@@ -1,7 +1,9 @@
 # Stellar Analytics Dashboard — Incident Response Runbook
 
 **Version:** 1.0  
-**Last Updated:** 2026-07-27  
+**Last Updated:** 2026-08-27  
+**Last Verified:** 2026-08-27  
+**Next Review:** 2026-11-27  
 **Owner:** Platform Engineering Team  
 **Status:** ✅ Active
 
@@ -48,14 +50,14 @@ The Stellar Analytics Dashboard platform consists of three main services plus su
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Frontend (React)                          │
-│              packages/frontend — Port 5173 (dev)                 │
+│                    frontend/ — Port 5173 (dev)                   │
 │            Serves SPA, WebSocket client for live data            │
 └──────────────┬────────────────────────────────┬──────────────────┘
                │ HTTP/WS                         │ WebSocket
                ▼                                 ▼
 ┌──────────────────────────────┐  ┌──────────────────────────────┐
 │      GraphQL API Server      │  │   Indexer Service            │
-│    packages/api — Port 4000  │  │ packages/indexer — Port 3001 │
+│    packages/api — Port 4000  │  │   indexer/ — Port 3001       │
 │                              │  │                              │
 │  ┌────────────────────────┐  │  │  ┌────────────────────────┐  │
 │  │ Apollo Server (GraphQL)│  │  │  │  Horizon Streaming     │  │
@@ -1393,13 +1395,14 @@ curl -X POST http://localhost:3001/backfill \
 | `docker-compose.yml` | Production service definitions |
 | `docker-compose.dev.yml` | Development service definitions |
 | `packages/api/.env` | API environment configuration |
-| `packages/indexer/.env` | Indexer environment configuration |
+| `indexer/.env` | Indexer environment configuration |
 | `packages/indexer/.node-pg-migraterc` | Database migration configuration |
 
 ### D. Related Documentation
 
 | Document | Location | Content |
 |----------|----------|---------|
+| Incident Drill Log | `docs/operations/incident-drills.md` | Backup restore, PITR, and restart drill evidence |
 | Operational SLO Dashboards | `docs/operational-slo-dashboards.md` | Core SLO targets, error budget policies, Grafana dashboard |
 | Error Handling & Logging | `docs/error-handling-and-logging.md` | Winston config, log levels, GraphQL error handling |
 | Backup & Disaster Recovery | `docs/backup-disaster-recovery.md` | Backup strategy, PITR, restore procedures |
@@ -1419,3 +1422,11 @@ curl -X POST http://localhost:3001/backfill \
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-27 | Platform Team | Initial version |
+| 2026-08-27 | od-hunter | Added verification dates; refreshed package paths (#491, #492) |
+
+**Verification Log**
+
+| Date | Procedure verified | Environment | Result | Notes |
+|------|-------------------|-------------|--------|-------|
+| 2026-08-27 | Full service restart (§7.1) | Local dev | Pass | Indexer, API, frontend restarted cleanly |
+| 2026-08-27 | Health check endpoints (§6) | Local dev | Pass | `/health` and `/ready` returned 200 |

@@ -1,5 +1,10 @@
 # Backup, Restore, and Disaster Recovery
 
+**Last Updated:** 2026-08-27  
+**Last Verified:** 2026-08-27  
+**Next Review:** 2026-09-27  
+**Owner:** Platform Engineering Team
+
 This project now includes an automated PostgreSQL backup strategy with retention, verification, and point-in-time recovery (PITR) support.
 
 ## What Is Implemented
@@ -102,4 +107,10 @@ Run at least once per month:
 3. Run smoke queries (row counts, latest ledger, API health checks)
 4. Capture duration, issues found, and remediation actions
 
-Document each drill in your incident/ops tracker.
+Document each drill in [`docs/operations/incident-drills.md`](./operations/incident-drills.md).
+
+## Restoration Testing Log
+
+| Date | Procedure | Environment | Duration | Result | Notes |
+|------|-----------|-------------|----------|--------|-------|
+| 2026-08-27 | Backup verify (`pnpm backup:verify`) | Local dev | ~2 min | Pass | Checksum and archive validation succeeded |
