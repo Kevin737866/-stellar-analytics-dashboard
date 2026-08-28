@@ -1,0 +1,127 @@
+name: Deployment Smoke Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment-url:
+        description: 'URL of the deployed application to test (e.g., https://staging.example.com)'
+        required: true
+        type: string
+      environment:
+        description: 'Deployment environment (staging, production)'
+        required: false
+        default: 'staging'
+        type: string
+      branch:
+        description: 'Branch being deployed'
+        required: false
+        default: 'main'
+        type: string
+
+  workflow_run:
+    workflows: ["Build and Deploy"]
+    types:
+      - completed
+
+jobs:
+  smoke-tests:
+    name: Deployment Smoke Tests
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v7
+        if: github.event_name == 'workflow_dispatch'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.12.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        if: github.event_name == 'workflow_dispatch'
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @stellar-analytics/e2e exec playwright install --with-deps
+        if: github.event_name == 'workflow_dispatch'
+
+      - name: Set deployment URL
+        id: set-url
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "DEPLOYMENT_URL=${{ github.event.inputs.deployment-url }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.workflow_run.head_branch }}" == "main" ]; then
+            echo "DEPLOYMENT_URL=https://prod.example.com" >> $GITHUB_OUTPUT
+          else
+            echo "DEPLOYMENT_URL=https://staging.example.com" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run deployment smoke tests
+        id: smoke-tests
+        env:
+          BASE_URL: ${{ steps.set-url.outputs.DEPLOYMENT_URL }}
+          DEPLOYMENT_BRANCH: ${{ github.event.inputs.branch || github.event.workflow_run.head_branch || 'unknown' }}
+          DEPLOYMENT_ENVIRONMENT: ${{ github.event.inputs.environment || (github.event.workflow_run.head_branch == 'main' && 'production' || 'staging') }}
+          CI: true
+        run: |
+          pnpm --filter @stellar-analytics/e2e test:smoke:ci
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-test-results-${{ github.run_id }}
+          path: |
+            packages/e2e/test-results/smoke/
+            packages/e2e/playwright-report/
+            packages/e2e/smoke-test-results.xml
+          retention-days: 14
+
+      - name: Publish test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: packages/e2e/smoke-test-results.xml
+          check_name: Deployment Smoke Tests
+          comment_mode: always
+
+      - name: Create deployment status comment
+        if: always() && github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const junitPath = 'packages/e2e/smoke-test-results.xml';
+            
+            if (!fs.existsSync(junitPath)) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '## Deployment Smoke Tests\\n⚠️ Test results not available (artifact upload failed)'
+              });
+              return;
+            }
+            
+            const xml = fs.readFileSync(junitPath, 'utf8');
+            const tests = (xml.match(/tests="(\d+)"/) || ['','?'])[1];
+            const failures = (xml.match(/failures="(\d+)"/) || ['','0'])[1];
+            const errors = (xml.match(/errors="(\d+)"/) || ['','0'])[1];
+            
+            const statusIcon = failures === '0' && errors === '0' ? '✅' : '❌';
+            const statusText = failures === '0' && errors === '0' ? 'PASSED' : 'FAILED';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Deployment Smoke Tests\\n${statusIcon} ${statusText}\\n- ✅ Tests Run: ${tests}\\n- ❌ Failures: ${failures}\\n- ⚠️ Errors: ${errors}\\n\\n**Deployment URL:** ${{ steps.set-url.outputs.DEPLOYMENT_URL }}`
+            });

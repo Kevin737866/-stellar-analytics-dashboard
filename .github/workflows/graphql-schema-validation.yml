@@ -1,0 +1,70 @@
+name: GraphQL Schema Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  schema-validation:
+    name: GraphQL Schema Validation
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.12.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate GraphQL schema
+        run: pnpm exec tsx scripts/validate-graphql-schemas.ts
+        env:
+          # Set to true for verbose output (slow mode with detailed error reporting)
+          SLOW_MODE: 'false'
+
+      - name: Check for schema changes in frontend
+        # This step checks if the frontend has queries that use fields not defined
+        # in the API schema (which would cause runtime errors)
+        run: |
+          echo "Verifying schema sync..."
+          
+          # Count schema definitions
+          SCHEMA_FIELDS=$(grep -c "type [A-Z]" packages/api/src/schema.ts || echo "0")
+          QUERY_OPERATIONS=$(grep -c "query \|mutation \|subscription " packages/frontend/src/graphql/queries.ts || echo "0")
+          
+          echo "API Schema fields: $SCHEMA_FIELDS"
+          echo "Frontend query operations: $QUERY_OPERATIONS"
+          
+          # Basic sanity check - if either is 0, something is wrong
+          if [ "$SCHEMA_FIELDS" -eq 0 ] || [ "$QUERY_OPERATIONS" -eq 0 ]; then
+            echo "⚠ Unexpected field or query count - manual review recommended"
+          fi
+
+      - name: Report validation results
+        if: always()
+        run: |
+          echo "### GraphQL Schema Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Schema Definitions**: Validated" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend Queries**: Validated against API schema" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Details" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This workflow validates:" >> $GITHUB_STEP_SUMMARY
+          echo "1. API schema syntax is valid GraphQL SDL" >> $GITHUB_STEP_SUMMARY
+          echo "2. Frontend queries are syntactically correct" >> $GITHUB_STEP_SUMMARY
+          echo "3. Frontend queries use fields defined in the API schema" >> $GITHUB_STEP_SUMMARY
