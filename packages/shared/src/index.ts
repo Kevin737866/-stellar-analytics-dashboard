@@ -7,3 +7,4 @@ export * from './types/account-events';
 export * from './utils/stellar';
 export * from './utils/stroop';
 export * from './utils/validation';
+export * from './utils/cursor';
