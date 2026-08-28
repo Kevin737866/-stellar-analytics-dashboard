@@ -6,7 +6,7 @@ System architecture and canonical package paths for the Stellar Analytics Dashbo
 
 ---
 
-## Canonical Package Paths
+## Canonical Package .
 
 The monorepo uses a mixed layout. Always use these paths when editing code or documentation:
 
