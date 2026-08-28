@@ -1,0 +1,116 @@
+name: Bug Report
+description: Report incorrect or broken behaviour in the Stellar Analytics Dashboard
+title: "fix: "
+labels: ["needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug!
+        Please fill in as much detail as possible — good reproduction steps are the fastest path to a fix.
+        A maintainer will review and prioritise this during the next triage meeting.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear, concise description of the incorrect or broken behaviour.
+      placeholder: "When I do X, Y happens instead of Z."
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps that reliably trigger the bug.
+      placeholder: |
+        1. Navigate to '...'
+        2. Click on '...'
+        3. Observe '...'
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should happen when the steps above are followed?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: What actually happens? Include error messages, stack traces, or screenshots.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area(s)
+      description: Which part(s) of the monorepo does this bug appear in?
+      multiple: true
+      options:
+        - frontend
+        - api
+        - indexer
+        - shared
+        - docs
+        - devops / ci
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How badly does this affect users?
+      options:
+        - "Critical – data loss, security issue, or service down"
+        - "High – major feature broken, no workaround"
+        - "Medium – feature degraded, workaround exists"
+        - "Low – minor inconvenience or cosmetic issue"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      description: What version or Git SHA are you running?
+      placeholder: "e.g. v1.2.3 or abc1234"
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, Node version, Docker version, or other relevant environment details.
+      placeholder: |
+        - OS: macOS 14.4
+        - Browser: Chrome 124
+        - Node: 20.11.0
+        - Docker: 26.0.0
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or screenshots
+      description: Paste any browser console errors, server logs, or attach screenshots. Wrap code in triple backticks.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Links to related issues, PRs, or external resources.
+    validations:
+      required: false

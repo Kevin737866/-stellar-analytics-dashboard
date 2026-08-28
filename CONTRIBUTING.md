@@ -286,6 +286,8 @@ Use the labels, areas, and title conventions in [`docs/contributor-issue-taxonom
 
 Third-party packages are kept current via Dependabot, which opens grouped PRs every Monday at 06:00 UTC. Security advisories are handled immediately regardless of the weekly schedule.
 
+Every Dependabot PR automatically triggers the **Dependency Update Verify** workflow (`.github/workflows/dependency-update-verify.yml`), which runs the full lint, type-check, build, and unit test suite and posts a consolidated pass/fail comment on the PR. Reviewers should wait for that comment to be green before merging.
+
 See [`docs/dependency-management.md`](docs/dependency-management.md) for the full update policy, review checklist, and instructions for manual updates.
 
 ## 🤝 Community Guidelines
@@ -324,16 +326,26 @@ Before submitting a PR, ensure:
 
 ## 🐛 Bug Reports
 
-When reporting bugs, include:
+Use the **Bug Report** template (`.github/ISSUE_TEMPLATE/bug_report.yml`) when opening a bug. The template prompts for reproduction steps, expected vs. actual behaviour, environment details, and relevant logs. Apply the `needs-triage` label manually if it is not added automatically.
 
-- Clear description of the issue
-- Steps to reproduce
-- Expected vs actual behavior
-- Environment details
-- Error messages and logs
+See [`docs/issue-triage-and-planning.md`](docs/issue-triage-and-planning.md) for how bugs move from filing through triage and into the sprint.
 
 ## 💡 Feature Requests
 
+Use the **Feature Request** template (`.github/ISSUE_TEMPLATE/feature_request.yml`). Include a problem statement, proposed solution, measurable acceptance criteria, and the affected monorepo area(s). All feature requests start with the `needs-triage` label and are scored at the bi-weekly triage meeting using the RICE framework.
 
+See [`docs/issue-triage-and-planning.md`](docs/issue-triage-and-planning.md) for the full triage and planning process.
+
+## 🗂️ Issue Triage and Work Planning
+
+All issues — features, bugs, and docs gaps — follow a consistent lifecycle:
+
+1. Filed with `needs-triage` and at least one area label
+2. Scored at the bi-weekly triage meeting (RICE framework)
+3. Assigned a priority label and milestone
+4. Pulled into a sprint at planning and assigned an owner
+5. Closed automatically when the linked PR merges
+
+The complete process, RICE scoring guide, sprint planning rules, and escalation path are documented in [`docs/issue-triage-and-planning.md`](docs/issue-triage-and-planning.md).
 
 Thank you for contributing to Stellar Analytics Dashboard! 🎉

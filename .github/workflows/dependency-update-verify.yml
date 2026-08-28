@@ -1,0 +1,434 @@
+name: Dependency Update Verify
+
+# Runs automatically on every Dependabot pull request.
+# Executes the repository's existing lint, type-check, build, and unit test
+# checks so reviewers can merge with confidence that the update is safe.
+#
+# Jobs are independent and run in parallel to keep total wall-clock time low.
+# A final summary job collects all results and posts a single PR comment.
+#
+# This workflow does NOT run on manually opened PRs or PRs from other actors.
+# Human-authored dependency bumps (chore(deps): manually bump …) should use
+# the standard CI workflow instead.
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+# Restrict all jobs to read-only repo access by default.
+# The summary job needs write access to post the PR comment.
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+
+  # ── Gate: only proceed for Dependabot PRs ──────────────────────────────────
+  check-actor:
+    name: Verify Dependabot Actor
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      is-dependabot: ${{ steps.actor-check.outputs.result }}
+    steps:
+      - name: Check if PR was opened by Dependabot
+        id: actor-check
+        run: |
+          if [ "${{ github.actor }}" = "dependabot[bot]" ]; then
+            echo "result=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  # ── Shared setup: install deps once, cache for downstream jobs ─────────────
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: check-actor
+    if: needs.check-actor.outputs.is-dependabot == 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Cache node_modules so lint/build/test jobs don't re-install
+      - name: Cache node_modules
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            api/node_modules
+            frontend/node_modules
+            indexer/node_modules
+            tools/eslint-rules/node_modules
+          key: deps-${{ github.sha }}
+
+  # ── Build the custom ESLint plugin (required before lint runs) ───────────
+  build-eslint-plugin:
+    name: Build ESLint Plugin
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: install
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            api/node_modules
+            frontend/node_modules
+            indexer/node_modules
+            tools/eslint-rules/node_modules
+          key: deps-${{ github.sha }}
+          fail-on-cache-miss: true
+
+      - name: Build @stellar-analytics/eslint-plugin
+        run: pnpm --filter @stellar-analytics/eslint-plugin build
+
+      - name: Cache built ESLint plugin
+        uses: actions/cache/save@v4
+        with:
+          path: tools/eslint-rules/dist
+          key: eslint-plugin-${{ github.sha }}
+
+  # ── Lint (all packages) ──────────────────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build-eslint-plugin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            api/node_modules
+            frontend/node_modules
+            indexer/node_modules
+            tools/eslint-rules/node_modules
+          key: deps-${{ github.sha }}
+          fail-on-cache-miss: true
+
+      - name: Restore built ESLint plugin
+        uses: actions/cache/restore@v4
+        with:
+          path: tools/eslint-rules/dist
+          key: eslint-plugin-${{ github.sha }}
+          fail-on-cache-miss: true
+
+      - name: Run full lint
+        run: pnpm lint
+        env:
+          CI: true
+
+      - name: Run API + Indexer custom rules
+        run: pnpm lint:api
+        env:
+          CI: true
+
+  # ── TypeScript type-check (all packages) ─────────────────────────────────
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build-eslint-plugin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            api/node_modules
+            frontend/node_modules
+            indexer/node_modules
+            tools/eslint-rules/node_modules
+          key: deps-${{ github.sha }}
+          fail-on-cache-miss: true
+
+      - name: Restore built ESLint plugin
+        uses: actions/cache/restore@v4
+        with:
+          path: tools/eslint-rules/dist
+          key: eslint-plugin-${{ github.sha }}
+          fail-on-cache-miss: true
+
+      - name: Type-check all packages
+        run: pnpm type-check
+        env:
+          CI: true
+
+      - name: Type-check API (strict)
+        run: pnpm type-check:api
+        env:
+          CI: true
+
+      - name: Type-check Indexer (strict)
+        run: pnpm type-check:indexer
+        env:
+          CI: true
+
+  # ── Build (all packages) ──────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: install
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            api/node_modules
+            frontend/node_modules
+            indexer/node_modules
+            tools/eslint-rules/node_modules
+          key: deps-${{ github.sha }}
+          fail-on-cache-miss: true
+
+      - name: Build all packages
+        run: pnpm build
+        env:
+          CI: true
+
+  # ── Unit tests (frontend + API + indexer) ─────────────────────────────────
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: install
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            api/node_modules
+            frontend/node_modules
+            indexer/node_modules
+            tools/eslint-rules/node_modules
+          key: deps-${{ github.sha }}
+          fail-on-cache-miss: true
+
+      - name: Run unit tests (all packages)
+        run: pnpm test:ci
+        env:
+          CI: true
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dep-update-coverage
+          path: packages/frontend/coverage/
+          retention-days: 7
+
+  # ── GraphQL schema lint ───────────────────────────────────────────────────
+  graphql-lint:
+    name: GraphQL Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: install
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            api/node_modules
+            frontend/node_modules
+            indexer/node_modules
+            tools/eslint-rules/node_modules
+          key: deps-${{ github.sha }}
+          fail-on-cache-miss: true
+
+      - name: Lint GraphQL operations
+        run: pnpm lint:graphql
+        env:
+          CI: true
+
+  # ── Summary comment on the PR ─────────────────────────────────────────────
+  # Runs after all checks regardless of outcome and posts a single consolidated
+  # status comment so reviewers don't have to read individual job logs to decide
+  # whether the update is safe to merge.
+  summary:
+    name: Post PR Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # check-actor must be in needs so its outputs are accessible here
+    needs: [check-actor, lint, typecheck, build, unit-tests, graphql-lint]
+    # Always run so the comment is posted even when a job fails.
+    # Downstream jobs were skipped when check-actor reported false, so we guard
+    # here to avoid posting a comment on non-Dependabot PRs.
+    if: always() && needs.check-actor.outputs.is-dependabot == 'true'
+
+    steps:
+      - name: Post dependency-update verification summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const results = {
+              lint:         '${{ needs.lint.result }}',
+              typecheck:    '${{ needs.typecheck.result }}',
+              build:        '${{ needs.build.result }}',
+              'unit-tests': '${{ needs.unit-tests.result }}',
+              'graphql-lint': '${{ needs.graphql-lint.result }}',
+            };
+
+            const icon = (r) =>
+              r === 'success'  ? '✅' :
+              r === 'failure'  ? '❌' :
+              r === 'skipped'  ? '⏭️' : '⚠️';
+
+            const allGreen = Object.values(results).every(r => r === 'success');
+
+            const rows = Object.entries(results)
+              .map(([job, result]) => `| ${icon(result)} ${job} | \`${result}\` |`)
+              .join('\n');
+
+            const headline = allGreen
+              ? '## ✅ Dependency update checks passed\nAll verification jobs are green. This PR is ready for review and merge.'
+              : '## ❌ One or more dependency update checks failed\nReview the failing jobs above before merging.';
+
+            const body = `${headline}
+
+            | Job | Result |
+            |-----|--------|
+            ${rows}
+
+            <sub>Posted automatically by the <strong>Dependency Update Verify</strong> workflow · <a href="${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}">View run</a></sub>`;
+
+            // Find an existing summary comment from a previous run and update it
+            // rather than posting a new comment on every push to the PR branch.
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const marker = '<!-- dep-update-verify-summary -->';
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+
+            const fullBody = `${marker}\n${body}`;
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner:      context.repo.owner,
+                repo:       context.repo.repo,
+                comment_id: existing.id,
+                body:       fullBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner:        context.repo.owner,
+                repo:         context.repo.repo,
+                issue_number: context.issue.number,
+                body:         fullBody,
+              });
+            }

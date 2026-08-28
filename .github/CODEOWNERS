@@ -1,65 +1,82 @@
 # CODEOWNERS — Stellar Analytics Dashboard
 #
-# Each line maps a path pattern to one or more owning teams or individuals.
+# Each line maps a path pattern to one or more owning teams.
 # Owners are automatically requested for review on any PR that touches
 # a matching file or directory.
 #
-# Teams follow the format: @org/team-name
-# Individuals follow the format: @github-username
+# Teams: @org/team-name   Individuals: @github-username
 #
-# More specific rules override less specific ones (last match wins in
-# GitHub's evaluation order, so place broader rules first).
+# Rules are evaluated top-to-bottom; the LAST matching rule wins.
+# Place broader/fallback rules first and more specific rules after.
 #
 # Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Human-readable companion: docs/code-ownership.md
 
-# ── Fallback owner (catches anything not matched below) ──────────────────────
-*                               @stellar-analytics/maintainers
+# ── Fallback — anything not matched below ────────────────────────────────────
+*                                       @stellar-analytics/maintainers
 
 # ── Repository-level configuration ──────────────────────────────────────────
-/.github/                       @stellar-analytics/maintainers
-/.husky/                        @stellar-analytics/maintainers
-/.eslintrc.js                   @stellar-analytics/maintainers
-/.prettierrc                    @stellar-analytics/maintainers
-/commitlint.config.js           @stellar-analytics/maintainers
-/tsconfig.json                  @stellar-analytics/maintainers
-/pnpm-workspace.yaml            @stellar-analytics/maintainers
-/package.json                   @stellar-analytics/maintainers
-/docker-compose*.yml            @stellar-analytics/platform-infra
+/.eslintrc.js                           @stellar-analytics/maintainers
+/.prettierrc                            @stellar-analytics/maintainers
+/.nvmrc                                 @stellar-analytics/maintainers
+/commitlint.config.js                   @stellar-analytics/maintainers
+/tsconfig.json                          @stellar-analytics/maintainers
+/pnpm-workspace.yaml                    @stellar-analytics/maintainers
+/package.json                           @stellar-analytics/maintainers
+/.gitignore                             @stellar-analytics/maintainers
+/.eslintignore                          @stellar-analytics/maintainers
 
-# ── CI/CD & Workflows ────────────────────────────────────────────────────────
-/.github/workflows/             @stellar-analytics/platform-infra @stellar-analytics/maintainers
-/.github/CODEOWNERS             @stellar-analytics/maintainers
+# ── Husky git hooks ──────────────────────────────────────────────────────────
+/.husky/                                @stellar-analytics/maintainers
+
+# ── GitHub meta — issue templates, Dependabot, repo settings ────────────────
+/.github/CODEOWNERS                     @stellar-analytics/maintainers
+/.github/ISSUE_TEMPLATE/               @stellar-analytics/maintainers
+/.github/dependabot.yml                 @stellar-analytics/platform-infra @stellar-analytics/maintainers
+
+# ── CI/CD workflows ──────────────────────────────────────────────────────────
+/.github/workflows/                     @stellar-analytics/platform-infra @stellar-analytics/maintainers
+
+# ── Custom ESLint tooling ────────────────────────────────────────────────────
+/tools/                                 @stellar-analytics/platform-infra @stellar-analytics/maintainers
+
+# ── Docker Compose (all variants) ────────────────────────────────────────────
+/docker-compose*.yml                    @stellar-analytics/platform-infra
+
+# ── Scripts (database, deployment, backup utilities) ─────────────────────────
+/scripts/                               @stellar-analytics/platform-infra
 
 # ── Shared package ───────────────────────────────────────────────────────────
-/shared/                        @stellar-analytics/maintainers
-/packages/shared/               @stellar-analytics/maintainers
+/shared/                                @stellar-analytics/maintainers
+/packages/shared/                       @stellar-analytics/maintainers
 
 # ── Indexer service ──────────────────────────────────────────────────────────
-/indexer/                       @stellar-analytics/indexer-team
-/packages/indexer/              @stellar-analytics/indexer-team
+/indexer/                               @stellar-analytics/indexer-team
+/packages/indexer/                      @stellar-analytics/indexer-team
+
+# Database migrations require sign-off from both indexer team and platform-infra
+# because they affect production data directly.
+/indexer/src/database/                  @stellar-analytics/indexer-team @stellar-analytics/platform-infra
+/packages/indexer/migrations/           @stellar-analytics/indexer-team @stellar-analytics/platform-infra
 
 # ── GraphQL API service ──────────────────────────────────────────────────────
-/api/                           @stellar-analytics/api-team
-/packages/api/                  @stellar-analytics/api-team
+/api/                                   @stellar-analytics/api-team
+/packages/api/                          @stellar-analytics/api-team
 
 # ── Frontend ─────────────────────────────────────────────────────────────────
-/frontend/                      @stellar-analytics/frontend-team
-/packages/frontend/             @stellar-analytics/frontend-team
+/frontend/                              @stellar-analytics/frontend-team
+/packages/frontend/                     @stellar-analytics/frontend-team
 
 # ── E2E test suite ───────────────────────────────────────────────────────────
-/packages/e2e/                  @stellar-analytics/qa-team @stellar-analytics/frontend-team
-
-# ── Infrastructure & Docker ──────────────────────────────────────────────────
-/scripts/                       @stellar-analytics/platform-infra
-/backups/                       @stellar-analytics/platform-infra
+/packages/e2e/                          @stellar-analytics/qa-team @stellar-analytics/frontend-team
 
 # ── Documentation ────────────────────────────────────────────────────────────
-/docs/                          @stellar-analytics/maintainers
-/README.md                      @stellar-analytics/maintainers
-/CONTRIBUTING.md                @stellar-analytics/maintainers
-/CACHING.md                     @stellar-analytics/api-team @stellar-analytics/maintainers
+/docs/                                  @stellar-analytics/maintainers
+/README.md                              @stellar-analytics/maintainers
+/CONTRIBUTING.md                        @stellar-analytics/maintainers
+/CHANGELOG.md                           @stellar-analytics/maintainers
+/DEVELOPMENT.md                         @stellar-analytics/maintainers
 
-# ── Database migrations ───────────────────────────────────────────────────────
-# Migrations touch production data — require platform-infra + indexer sign-off
-/indexer/src/database/          @stellar-analytics/indexer-team @stellar-analytics/platform-infra
-/packages/indexer/migrations/   @stellar-analytics/indexer-team @stellar-analytics/platform-infra
+# CACHING.md is jointly owned — API team authors the content, maintainers gate merges
+/CACHING.md                             @stellar-analytics/api-team @stellar-analytics/maintainers
