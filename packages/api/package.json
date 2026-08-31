@@ -21,7 +21,7 @@
     "graphql": "^16.8.1",
     "graphql-subscriptions": "^2.0.0",
     "graphql-ws": "^5.14.3",
-    "ws": "^8.14.2",
+    "ws": "^8.21.3",
     "dataloader": "^2.2.2",
     "pg": "^8.11.3",
     "redis": "^4.6.10",
