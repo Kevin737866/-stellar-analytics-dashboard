@@ -49,10 +49,10 @@ jobs:
     if: needs.check-actor.outputs.is-dependabot == 'true'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -67,7 +67,7 @@ jobs:
 
       # Cache node_modules so lint/build/test jobs don't re-install
       - name: Cache node_modules
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: |
             node_modules
@@ -86,10 +86,10 @@ jobs:
     needs: install
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -100,7 +100,7 @@ jobs:
           version: 9.12.0
 
       - name: Restore node_modules
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             node_modules
@@ -116,7 +116,7 @@ jobs:
         run: pnpm --filter @stellar-analytics/eslint-plugin build
 
       - name: Cache built ESLint plugin
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: tools/eslint-rules/dist
           key: eslint-plugin-${{ github.sha }}
@@ -129,10 +129,10 @@ jobs:
     needs: build-eslint-plugin
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -143,7 +143,7 @@ jobs:
           version: 9.12.0
 
       - name: Restore node_modules
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             node_modules
@@ -156,7 +156,7 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Restore built ESLint plugin
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: tools/eslint-rules/dist
           key: eslint-plugin-${{ github.sha }}
@@ -180,10 +180,10 @@ jobs:
     needs: build-eslint-plugin
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -194,7 +194,7 @@ jobs:
           version: 9.12.0
 
       - name: Restore node_modules
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             node_modules
@@ -207,7 +207,7 @@ jobs:
           fail-on-cache-miss: true
 
       - name: Restore built ESLint plugin
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: tools/eslint-rules/dist
           key: eslint-plugin-${{ github.sha }}
@@ -236,10 +236,10 @@ jobs:
     needs: install
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -250,7 +250,7 @@ jobs:
           version: 9.12.0
 
       - name: Restore node_modules
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             node_modules
@@ -275,10 +275,10 @@ jobs:
     needs: install
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -289,7 +289,7 @@ jobs:
           version: 9.12.0
 
       - name: Restore node_modules
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             node_modules
@@ -308,7 +308,7 @@ jobs:
 
       - name: Upload coverage report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dep-update-coverage
           path: packages/frontend/coverage/
@@ -322,10 +322,10 @@ jobs:
     needs: install
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -336,7 +336,7 @@ jobs:
           version: 9.12.0
 
       - name: Restore node_modules
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             node_modules
@@ -370,7 +370,7 @@ jobs:
 
     steps:
       - name: Post dependency-update verification summary
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const results = {
