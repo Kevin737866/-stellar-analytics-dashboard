@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@stellar-analytics/shared": "workspace:*",
-    "@stellar/stellar-sdk": "^14.6.1",
+    "@stellar/stellar-sdk": "^17.0.1",
     "dotenv": "^17.2.3",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
