@@ -45,7 +45,7 @@ describe('E2E test counts (issue #488)', () => {
 
     expect(specFiles).toHaveLength(extractMarker(guide, 'e2e-suite-count'));
     expect(total).toBe(extractMarker(guide, 'e2e-test-count'));
-    expect(total).toBe(68);
+    expect(total).toBe(71);
     expect(perFile).toMatchObject({
       'auth.spec.ts': 7,
       'dashboard.spec.ts': 9,
@@ -55,11 +55,12 @@ describe('E2E test counts (issue #488)', () => {
       'responsive.spec.ts': 7,
       'performance.spec.ts': 6,
       'visual-regression.spec.ts': 20,
+      'failure-metadata.spec.ts': 3,
     });
   });
 
   it('documents the total in README.md', () => {
     const readme = readRepoFile('packages/e2e/README.md');
-    expect(readme).toContain('68 Playwright tests');
+    expect(readme).toContain('71 Playwright tests');
   });
 });
