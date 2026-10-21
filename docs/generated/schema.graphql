@@ -1,0 +1,125 @@
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type Ledger {
+  sequence: Int!
+  hash: String!
+  closeTime: String!
+  transactionCount: Int!
+  operations: [Operation!]!
+  transactions: [Transaction!]!
+}
+
+type LedgerEdge {
+  node: Ledger!
+  cursor: String!
+}
+
+type LedgerConnection {
+  edges: [LedgerEdge!]!
+  pageInfo: PageInfo!
+}
+
+type Transaction {
+  hash: String!
+  ledgerSequence: Int!
+  sourceAccount: String!
+  feeCharged: String!
+  operations: [Operation!]!
+}
+
+type Operation {
+  id: String!
+  txHash: String!
+  type: String!
+  sourceAccount: String!
+  createdAt: String!
+}
+
+type Account {
+  address: String!
+  transactions(limit: Int): [Transaction!]!
+  operations(limit: Int): [Operation!]!
+}
+
+type AccountStats {
+  address: String!
+  transactionCount: Int!
+  totalPaymentVolume: String!
+  lastActive: String!
+}
+
+type NetworkStats {
+  tps: Float!
+  totalAccounts: Int!
+  activeAccounts24h: Int!
+  totalLedgers: Int!
+}
+
+type DataFreshness {
+  ledgersLastUpdated: String!
+  transactionsLastUpdated: String!
+  operationsLastUpdated: String!
+  dashboardLastUpdated: String!
+}
+
+type AssetVolume {
+  assetCode: String!
+  volume: String!
+  timeframe: String!
+}
+
+type TopAccount {
+  address: String!
+  balance: String!
+}
+
+type Query {
+  health: Health!
+  ledger(sequence: Int!): Ledger
+  ledgers(limit: Int, cursor: String): LedgerConnection!
+  transactions(address: String, addresses: [String!], limit: Int): [Transaction!]!
+  operations(type: String, limit: Int): [Operation!]!
+  accountStats(address: String!): AccountStats!
+  networkStats: NetworkStats!
+  stats: Stats!
+  networkMetrics(timeRange: TimeRangeInput, preset: TimeRangePreset): [NetworkMetrics!]!
+  assetVolume(assetCode: String!, timeframe: String!): AssetVolume!
+  topAccounts(limit: Int): [TopAccount!]!
+  dailyTransactionCount(days: Int): [DailyCount!]!
+  dataFreshness: DataFreshness!
+}
+
+enum TimeRangePreset {
+  LAST_HOUR
+  LAST_DAY
+  LAST_WEEK
+  LAST_MONTH
+}
+
+input TimeRangeInput {
+  startTime: String
+  endTime: String
+}
+
+type DailyCount {
+  date: String!
+  count: Int!
+}
+
+type Health {
+  status: String!
+  timestamp: String!
+}
+
+type LedgerAddedEvent {
+  sequence: Int!
+  transactionCount: Int!
+  closeTime: String!
+}
+
+type Subscription {
+  ledgerAdded: LedgerAddedEvent!
+}

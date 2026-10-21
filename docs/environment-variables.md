@@ -71,6 +71,7 @@ See also: `indexer/ALERTING.md`, `indexer/BACKFILL.md`
 | `RATE_LIMIT_JWT_USER_MAX` | No | `1000` | JWT user requests per window |
 | `RATE_LIMIT_ANON_WINDOW_MS` | No | `60000` | Anonymous rate-limit window |
 | `RATE_LIMIT_ANON_MAX` | No | `100` | Anonymous requests per window |
+| `GRAPHQL_MAX_DEPTH` | No | `10` | Max GraphQL query depth (`packages/api`); integer clamped to 1–50, invalid values fall back to 10 |
 | `PERF_ALERTING_ENABLED` | No | `false` | Enable API performance alerting |
 | `PERF_SLOW_GRAPHQL_WARN_MS` | No | `1000` | GraphQL slow-query warn threshold |
 | `PERF_SLOW_GRAPHQL_CRITICAL_MS` | No | `5000` | GraphQL slow-query critical threshold |
