@@ -11,8 +11,8 @@ This document defines the controls designed to prevent expensive, recursive, or 
 
 | Control | Status | Specification | Enforcement Location | Notes |
 |---|---|---|---|---|
-| **IP Rate Limiting** | ✅ **Enforced** | 100 req / 60s window | `api/src/index.ts` | Active sliding-window in-memory rate limiter returning HTTP `429`. |
-| **Query Depth Limiting** | ⚠️ **Aspirational** | Max depth: 10 levels | Staged (`packages/api/src/index.ts`) | Defined via `graphql-depth-limit`; pending validation rule integration in root `api/src/index.ts`. |
+| **IP Rate Limiting** | ✅ **Enforced** | 100 req / 60s window | `api/src/rateLimit.ts` | Fixed-window limiter returning HTTP `429` with `RateLimit-*` and `Retry-After` headers; in-memory by default, shared Postgres store via `RATE_LIMIT_STORE=postgres`. See [Rate Limiting](#rate-limiting). |
+| **Query Depth Limiting** | ✅ **Enforced** | Max depth: 10 levels | `api/src/depthLimit.ts` | Custom validation rule run on HTTP (GET/POST) and WebSocket operations in `api/src/index.ts`. |
 | **Query Complexity Score** | ⚠️ **Aspirational** | Max cost: 1000 points | Staged (`packages/api/src/index.ts`) | Pre-execution AST cost calculation; pending Apollo server pipeline promotion. |
 | **`X-Query-Complexity` Header** | ⚠️ **Aspirational** | Telemetry response header | Roadmap | Target feature to enable client-side budget tuning prior to hitting thresholds. |
 | **Production Introspection Guard** | ⚠️ **Aspirational** | `introspection: false` in prod | Staged (`packages/api/src/index.ts`) | Introspection is disabled in Apollo configuration; plain GraphQL endpoint in `api/src/index.ts` still resolves introspection queries. |
@@ -21,9 +21,7 @@ This document defines the controls designed to prevent expensive, recursive, or 
 
 ## Depth Limiting
 
-> ⚠️ **Status: Aspirational / In-Progress**
-> 
-> *The depth-limiting validation rule is fully specified below but is not yet wired into the active server entrypoint (`api/src/index.ts`). For operational context, see [docs/api-examples.md §5.2](./api-examples.md#52-depth-limiting-is-essentially-unreachable).*
+> ✅ **Status: Enforced** in `api/src/index.ts` via the `depthLimit()` rule in `api/src/depthLimit.ts`. Fragments are expanded when measuring depth and introspection fields (`__typename`, `__schema`, …) are ignored.
 
 Depth limiting is applied via the [graphql-depth-limit](https://github.com/stems/graphql-depth-limit) package as a GraphQL validation rule:
 
@@ -137,7 +135,7 @@ When a query exceeds the complexity limit, the API will return a `400`-level Gra
 
 ## Adjusting the Depth Limit
 
-The target depth limit default is `10` in `packages/api/src/index.ts`. When promoted to production, it is configurable via environment variable:
+The root API (`api/src/depthLimit.ts`) reads `GRAPHQL_MAX_DEPTH` at startup (default `10`). The staged `packages/api` server follows the same convention:
 
 ```typescript
 const maxDepth = parseInt(process.env.GRAPHQL_MAX_DEPTH || '10', 10);
@@ -152,6 +150,31 @@ Environment variable:
 ```env
 GRAPHQL_MAX_DEPTH=10
 ```
+
+---
+
+## Rate Limiting
+
+The root API applies a per-client budget of 100 requests per 60-second window to `/graphql` (`api/src/rateLimit.ts`).
+
+### Response Headers
+
+Every `/graphql` response includes:
+
+| Header | Meaning |
+|---|---|
+| `RateLimit-Limit` | Requests allowed per window |
+| `RateLimit-Remaining` | Requests left in the current window |
+| `RateLimit-Reset` | Seconds until the window resets |
+| `Retry-After` | Only on `429`; seconds to wait before retrying |
+
+### Shared Storage
+
+By default counters live in process memory, so each replica enforces its own budget. Set `RATE_LIMIT_STORE=postgres` to store counters in the `api_rate_limits` table (created automatically on first use) so all replicas share one budget. If Postgres is unavailable the API logs the error and falls back to the in-memory store rather than rejecting traffic. Expired rows are pruned every minute.
+
+### Client IP Resolution
+
+`X-Forwarded-For` is ignored unless `TRUST_PROXY_HOPS` is set to the number of trusted reverse proxies in front of the API. With `TRUST_PROXY_HOPS=N`, the client IP is the `N`th entry from the right of the header; values that are not valid IPv4/IPv6 addresses are discarded and the socket address is used instead. Leave it at `0` when the API is exposed directly, otherwise clients can spoof their address to evade rate limits.
 
 ---
 
