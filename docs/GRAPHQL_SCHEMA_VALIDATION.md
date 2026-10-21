@@ -141,3 +141,18 @@ pnpm test --coverage
 - [GraphQL Query Standards](./graphql-query-standards.md)
 - [API Examples](./api-examples.md)
 - [CI Operational Notes](./CI_OPERATIONAL_NOTES.md)
+
+## Generated Schema Documentation
+
+Reference docs are generated from the active API schema (`api/src/schema.ts`):
+
+```bash
+pnpm docs:graphql
+```
+
+This writes:
+
+- `docs/generated/schema.graphql`: the printed SDL
+- `docs/generated/graphql-schema.md`: a Markdown reference of every type, field, argument, and enum value
+
+Re-run the command and commit the output whenever `api/src/schema.ts` changes.

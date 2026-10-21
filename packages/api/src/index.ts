@@ -11,6 +11,7 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import winston from 'winston';
 import depthLimit from 'graphql-depth-limit';
+import { resolveMaxQueryDepth } from './utils/graphql-depth';
 
 import { typeDefs } from './schema/typeDefs';
 import { resolvers } from './resolvers';
@@ -708,7 +709,7 @@ class ApiServer {
         };
       },
       introspection: !isProduction,
-      validationRules: [depthLimit(10) as any],
+      validationRules: [depthLimit(resolveMaxQueryDepth()) as any],
       plugins,
       // Issue #217 – Enable automatic persisted queries to reduce payload size
       // Clients can send a hash of the query instead of the full query text.

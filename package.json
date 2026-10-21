@@ -24,6 +24,7 @@
     "type-check:indexer": "tsc -p indexer/tsconfig.json --noEmit",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css,scss,html}\"",
     "test": "pnpm -r --if-present test",
+    "docs:graphql": "pnpm --dir api docs:graphql",
     "test:schema": "tsx scripts/validate-graphql-schemas.ts",
     "test:schema:ci": "cross-env CI=true tsx scripts/validate-graphql-schemas.ts",
     "test:container": "bash scripts/scan-containers.sh filesystem",
