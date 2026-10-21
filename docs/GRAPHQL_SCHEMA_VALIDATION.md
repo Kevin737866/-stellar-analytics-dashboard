@@ -141,3 +141,13 @@ pnpm test --coverage
 - [GraphQL Query Standards](./graphql-query-standards.md)
 - [API Examples](./api-examples.md)
 - [CI Operational Notes](./CI_OPERATIONAL_NOTES.md)
+
+## Schema Snapshot Check
+
+`packages/api/src/schema/typeDefs.snapshot.test.ts` compares the API schema SDL with the committed Jest snapshot in `packages/api/src/schema/__snapshots__/`. Any schema change fails `pnpm --filter @stellar-analytics/api test` until the snapshot is updated on purpose:
+
+```bash
+pnpm --filter @stellar-analytics/api test -- -u src/schema/typeDefs.snapshot.test.ts
+```
+
+Review the snapshot diff in the PR. Removed or renamed fields are breaking changes (see `docs/api-versioning.md`).

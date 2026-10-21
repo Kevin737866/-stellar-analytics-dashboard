@@ -36,6 +36,12 @@ import {
 } from './utils/tracer';
 import { formatGraphQLError, QueryTooComplexError } from './utils/resolver-error';
 import { verify } from 'jsonwebtoken';
+import {
+  getBodyLimit,
+  getRequestTimeoutMs,
+  isIntrospectionAllowed,
+  payloadTooLargeHandler,
+} from './utils/http-policy';
 
 dotenv.config();
 
@@ -204,7 +210,7 @@ class ApiServer {
     });
 
     // ── Request Timeout ────────────────────────────────────────────────────────────
-    this.app.use(timeoutMiddleware(30000, this.logger));
+    this.app.use(timeoutMiddleware(getRequestTimeoutMs(), this.logger));
 
     // ── HTTP performance tracking middleware ──────────────────────────────────────
     this.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -707,7 +713,7 @@ class ApiServer {
           authService,
         };
       },
-      introspection: !isProduction,
+      introspection: isIntrospectionAllowed(),
       validationRules: [depthLimit(10) as any],
       plugins,
       // Issue #217 – Enable automatic persisted queries to reduce payload size
@@ -741,12 +747,17 @@ class ApiServer {
         app: this.app as any,
         path: '/graphql',
         cors: false,
+        bodyParserConfig: { limit: getBodyLimit() },
       });
+      this.app.use(payloadTooLargeHandler);
 
       await mountAdminGraphQL(this.app, this.logger);
 
       this.httpServer = createServer(this.app);
-      this.httpServer.timeout = 30000; // 30s default timeout
+      const requestTimeoutMs = getRequestTimeoutMs();
+      this.httpServer.timeout = requestTimeoutMs;
+      this.httpServer.requestTimeout = requestTimeoutMs;
+      this.httpServer.headersTimeout = Math.min(this.httpServer.headersTimeout, requestTimeoutMs);
       this.setupWebSocketServer();
       await this.realtimePublisher.start();
 
