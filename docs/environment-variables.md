@@ -55,6 +55,9 @@ See also: `indexer/ALERTING.md`, `indexer/BACKFILL.md`
 | `REDIS_URL` | Yes | — | Redis connection string |
 | `PORT` | No | `4000` | HTTP server port |
 | `NODE_ENV` | No | `development` | Runtime environment |
+| `API_BODY_LIMIT` | No | `100kb` | Maximum `/graphql` request body size; larger bodies get `413 Payload too large` |
+| `API_REQUEST_TIMEOUT_MS` | No | `30000` | Per-request HTTP timeout; slow requests get `503 Request timeout` and the Node server's `requestTimeout` is set to match |
+| `ALLOW_INTROSPECTION` | No | — | GraphQL introspection override. Unset: enabled outside production, disabled when `NODE_ENV=production`. `true`/`false` forces it on/off |
 | `CORS_ORIGIN` | No | `*` | Allowed CORS origin(s) |
 | `JWT_SECRET` | Yes (prod) | dev default | JWT signing secret (min 32 chars) |
 | `LOG_LEVEL` | No | `info` | Minimum log level |

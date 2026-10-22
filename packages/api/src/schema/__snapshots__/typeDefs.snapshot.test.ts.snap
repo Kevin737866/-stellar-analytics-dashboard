@@ -1,0 +1,740 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GraphQL schema snapshot matches the committed schema snapshot 1`] = `
+""ISO 8601 formatted date-time string"
+  scalar DateTime
+  "Arbitrary JSON data"
+  scalar JSON
+
+  "Pagination metadata for cursor-based pagination (Relay-style)"
+  type PageInfo {
+    "Whether there are more results after the current page"
+    hasNextPage: Boolean!
+    "Whether there are results before the current page"
+    hasPreviousPage: Boolean!
+    "Cursor for the first item in this page"
+    startCursor: String
+    "Cursor for the last item in this page"
+    endCursor: String
+  }
+
+  "An edge containing a node and its cursor for pagination"
+  type Edge<T> {
+    "Opaque cursor for this node's position"
+    cursor: String!
+    "The actual data item"
+    node: T!
+  }
+
+  "A paginated collection of items with metadata"
+  type Connection<T> {
+    "List of edges in this page"
+    edges: [Edge<T>]!
+    "Pagination metadata for navigating results"
+    pageInfo: PageInfo!
+    "Total count of items matching the query (across all pages)"
+    totalCount: Int!
+  }
+
+  "A Stellar asset (native XLM or custom token)"
+  type Asset {
+    "Type of asset: native, credit_alphanum4, or credit_alphanum12"
+    assetType: String!
+    "Asset code (e.g., 'USDC', 'XLM') — null for native"
+    assetCode: String
+    "Issuing account address — null for native"
+    assetIssuer: String
+    "Whether this is the native asset (XLM)"
+    native: Boolean
+  }
+
+  "A Stellar ledger (block) containing a batch of transactions"
+  type Ledger {
+    "Unique ledger identifier"
+    id: String!
+    "Ledger sequence number"
+    sequence: Int!
+    "Number of successful transactions in this ledger"
+    successfulTransactionCount: Int!
+    "Number of failed transactions in this ledger"
+    failedTransactionCount: Int!
+    "Total number of operations across all transactions"
+    operationCount: Int!
+    "Number of operations in the transaction set"
+    txSetOperationCount: Int!
+    "When the ledger was closed"
+    closedAt: DateTime!
+    "Total coins in circulation at ledger close"
+    totalCoins: String!
+    "Fee pool balance at ledger close"
+    feePool: String!
+    "Base fee in stroops"
+    baseFeeInStroops: Int!
+    "Base reserve in stroops"
+    baseReserveInStroops: Int!
+    "Maximum transaction set size"
+    maxTxSetSize: Int!
+    "Stellar protocol version"
+    protocolVersion: Int!
+    "Base64-encoded ledger header XDR"
+    headerXdr: String!
+    "Record creation timestamp"
+    createdAt: DateTime!
+    "Last update timestamp"
+    updatedAt: DateTime!
+  }
+
+  "A Stellar transaction submitted to the network"
+  type Transaction {
+    "Unique transaction identifier"
+    id: String!
+    "Paging token for cursor-based pagination"
+    pagingToken: String!
+    "Whether the transaction was successful"
+    successful: Boolean!
+    "Transaction hash (hex)"
+    hash: String!
+    "Ledger sequence where this transaction was included"
+    ledger: Int!
+    "When the transaction was created"
+    createdAt: DateTime!
+    "Source account address"
+    sourceAccount: String!
+    "Source account sequence number at submission time"
+    sourceAccountSequence: String!
+    "Account that paid the fee (may differ from source)"
+    feeAccount: String
+    "Actual fee charged in stroops"
+    feeCharged: Int!
+    "Maximum fee the source was willing to pay"
+    maxFee: Int!
+    "Number of operations in this transaction"
+    operationCount: Int!
+    "Base64-encoded transaction envelope XDR"
+    envelopeXdr: String!
+    "Base64-encoded transaction result XDR"
+    resultXdr: String!
+    "Base64-encoded result metadata XDR"
+    resultMetaXdr: String!
+    "Base64-encoded fee metadata XDR"
+    feeMetaXdr: String!
+    "Type of memo attached (none, text, id, hash, return)"
+    memoType: String
+    "Memo value"
+    memo: String
+    "List of transaction signatures"
+    signatures: [String!]!
+    "Earliest time the transaction is valid"
+    validAfter: DateTime
+    "Latest time the transaction is valid"
+    validBefore: DateTime
+    "Whether this is a fee-bump transaction"
+    feeBumpTransaction: Boolean
+    "Inner transaction for fee-bump transactions"
+    innerTransaction: Transaction
+    "Operations contained in this transaction"
+    operations: [Operation!]!
+    "Last update timestamp"
+    updatedAt: DateTime!
+  }
+
+  "An individual operation within a Stellar transaction"
+  type Operation {
+    "Unique operation identifier"
+    id: String!
+    "Paging token for cursor-based pagination"
+    pagingToken: String!
+    "Hash of the parent transaction"
+    transactionHash: String!
+    "Whether the parent transaction was successful"
+    transactionSuccessful: Boolean!
+    "Operation type (e.g., 'payment', 'create_account', 'manage_sell_offer')"
+    type: String!
+    "When the operation was created"
+    createdAt: DateTime!
+    "Source account of the operation"
+    sourceAccount: String!
+    "Parent transaction"
+    transaction: Transaction!
+    "Ledger sequence where this operation was applied"
+    ledger: Int!
+    "Index of this operation within the transaction (0-based)"
+    operationIndex: Int!
+    "Operation-specific details as JSON"
+    details: JSON!
+    "Last update timestamp"
+    updatedAt: DateTime!
+  }
+
+  "A Stellar account with balances, trustlines, and signers"
+  type Account {
+    "Account public key (Stellar address)"
+    accountId: String!
+    "Balance for this trustline"
+    balance: String!
+    "Asset type for this trustline"
+    assetType: String!
+    "Asset code for this trustline"
+    assetCode: String
+    "Asset issuer for this trustline"
+    assetIssuer: String
+    "Buying liabilities in stroops"
+    buyingLiabilities: String!
+    "Selling liabilities in stroops"
+    sellingLiabilities: String!
+    "Last ledger that modified this account"
+    lastModifiedLedger: Int!
+    "Whether the account is authorized"
+    isAuthorized: Boolean!
+    "Whether authorized to maintain liabilities"
+    isAuthorizedToMaintainLiabilities: Boolean!
+    "Whether clawback is enabled"
+    isClawbackEnabled: Boolean!
+    "Current account sequence number"
+    sequenceNumber: String!
+    "Number of subentries (trustlines, offers, signers, data)"
+    numSubentries: Int!
+    "Account thresholds (low, medium, high)"
+    thresholds: JSON!
+    "Account flags"
+    flags: JSON!
+    "Account signers with weights"
+    signers: JSON!
+    "Account data entries"
+    data: JSON!
+    "Sponsoring account address"
+    sponsor: String
+    "Number of sponsored entries"
+    numSponsored: Int!
+    "Number of sponsoring entries"
+    numSponsoring: Int!
+    "Account creation timestamp"
+    createdAt: DateTime!
+    "Last update timestamp"
+    updatedAt: DateTime!
+  }
+
+  # ── Concrete Connection / Edge types ───────────────────────────────────────
+
+  type LedgerEdge {
+    cursor: String!
+    node: Ledger!
+  }
+
+  type LedgerConnection {
+    edges: [LedgerEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+  }
+
+  type TransactionEdge {
+    cursor: String!
+    node: Transaction!
+  }
+
+  type TransactionConnection {
+    edges: [TransactionEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+  }
+
+  type OperationEdge {
+    cursor: String!
+    node: Operation!
+  }
+
+  type OperationConnection {
+    edges: [OperationEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+  }
+
+  type AccountEdge {
+    cursor: String!
+    node: Account!
+  }
+
+  type AccountConnection {
+    edges: [AccountEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+  }
+
+  type AssetEdge {
+    cursor: String!
+    node: Asset!
+  }
+
+  type AssetConnection {
+    edges: [AssetEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+  }
+
+  type AssetMetricsEdge {
+    cursor: String!
+    node: AssetMetrics!
+  }
+
+  """
+  Summary totals across ALL matching assets (not just the current page) —
+  issue #220: aggregation endpoints should return totals alongside
+  paginated results, not just the current page's data.
+  """
+  type AssetMetricsAggregate {
+    totalVolume24h: String!
+    totalTrades24h: Int!
+    averagePriceChange24h: Float!
+    totalHolders: Int!
+  }
+
+  type AssetMetricsConnection {
+    edges: [AssetMetricsEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+    aggregates: AssetMetricsAggregate!
+  }
+
+  type AccountMetricsEdge {
+    cursor: String!
+    node: AccountMetrics!
+  }
+
+  type AccountMetricsConnection {
+    edges: [AccountMetricsEdge!]!
+    pageInfo: PageInfo!
+    totalCount: Int!
+  }
+
+  # ── Analytics types ────────────────────────────────────────────────────────
+
+  type NetworkMetrics {
+    "Timestamp of this data point"
+    timestamp: DateTime!
+    "Number of ledgers in this window"
+    ledgerCount: Int!
+    "Number of transactions in this window"
+    transactionCount: Int!
+    "Number of operations in this window"
+    operationCount: Int!
+    "Number of unique active accounts"
+    activeAccounts: Int!
+    "Total payment volume in this window"
+    totalVolume: String!
+    "Average fee paid per transaction"
+    averageFee: Float!
+    "Percentage of successful transactions"
+    successRate: Float!
+  }
+
+  """
+  Aggregated totals for \`networkMetrics\` over a time range — issue #220:
+  aggregation endpoints should return summary counts/totals, not just the
+  raw list of per-bucket data points.
+  """
+  type NetworkMetricsSummary {
+    dataPointCount: Int!
+    totalLedgers: Int!
+    totalTransactions: Int!
+    totalOperations: Int!
+    totalVolume: String!
+    averageFee: Float!
+    averageSuccessRate: Float!
+    earliestTimestamp: DateTime
+    latestTimestamp: DateTime
+  }
+
+  type AssetMetrics {
+    "The asset these metrics apply to"
+    asset: Asset!
+    "Trading volume over the last 24 hours"
+    volume24h: String!
+    "Trading volume over the last 7 days"
+    volume7d: String!
+    "Trading volume over the last 30 days"
+    volume30d: String!
+    "Number of trades in the last 24 hours"
+    trades24h: Int!
+    "Number of trades in the last 7 days"
+    trades7d: Int!
+    "Number of trades in the last 30 days"
+    trades30d: Int!
+    "Price change percentage over 24 hours"
+    priceChange24h: Float!
+    "Estimated market capitalization"
+    marketCap: String
+    "Number of unique holders"
+    holders: Int!
+  }
+
+  "Activity metrics for a specific Stellar account"
+  type AccountMetrics {
+    "Account public key"
+    accountId: String!
+    "Native (XLM) balance"
+    balanceNative: String!
+    "Total balance in USD equivalent"
+    totalBalanceUsd: String!
+    "Transaction count in the last 24 hours"
+    transactionCount24h: Int!
+    "Transaction count in the last 7 days"
+    transactionCount7d: Int!
+    "Transaction count in the last 30 days"
+    transactionCount30d: Int!
+    "Timestamp of the account's first transaction"
+    firstTransaction: DateTime
+    "Timestamp of the account's most recent transaction"
+    lastTransaction: DateTime!
+    "Whether the account has been active recently"
+    isActive: Boolean!
+    "Number of trustlines"
+    trustlines: Int!
+    "Number of signers"
+    signers: Int!
+  }
+
+  "Cohort analysis grouping accounts by activity patterns"
+  type AccountCohort {
+    "Cohort identifier (e.g., 'high-activity', 'medium-activity', 'dormant')"
+    cohortId: String!
+    "Human-readable label for this cohort"
+    label: String!
+    "Number of accounts in this cohort"
+    accountCount: Int!
+    "Average transaction count per account in this cohort"
+    averageTransactionCount: Float!
+    "Total transaction volume from accounts in this cohort"
+    totalVolume: String!
+    "Percentage of total accounts this cohort represents"
+    percentageOfTotal: Float!
+    "Date range this cohort analysis covers"
+    dateRange: CohortDateRange!
+  }
+
+  "Date range descriptor for cohort analysis"
+  type CohortDateRange {
+    "Start of the cohort period"
+    startDate: String!
+    "End of the cohort period"
+    endDate: String!
+  }
+
+  "Input for cursor-based pagination (Relay-style)"
+  input PaginationInput {
+    "Number of items to fetch forward from the cursor (max 100)"
+    first: Int
+    "Cursor to start fetching after"
+    after: String
+    "Number of items to fetch backward from the cursor (max 100)"
+    last: Int
+    "Cursor to start fetching before"
+    before: String
+  }
+
+  "Time range filter for queries"
+  input TimeRangeInput {
+    "Start of the time range (ISO 8601)"
+    startTime: DateTime
+    "End of the time range (ISO 8601)"
+    endTime: DateTime
+    "Preset time range for convenience"
+    preset: TimeRangePreset
+  }
+
+  "Preset time range options for faster dashboard queries"
+  enum TimeRangePreset {
+    LAST_HOUR
+    LAST_DAY
+    LAST_WEEK
+    LAST_MONTH
+  }
+
+  "Filter for asset queries"
+  input AssetFilterInput {
+    "Filter by asset type (native, credit_alphanum4, credit_alphanum12)"
+    assetType: String
+    "Filter by asset code"
+    assetCode: String
+    "Filter by issuing account address"
+    assetIssuer: String
+  }
+
+  "Filter for account queries"
+  input AccountFilterInput {
+    "Filter by account address"
+    accountId: String
+    "Minimum balance threshold"
+    minBalance: String
+    "Maximum balance threshold"
+    maxBalance: String
+    "Filter by active/inactive status"
+    isActive: Boolean
+  }
+
+  "Filter for transaction queries"
+  input TransactionFilterInput {
+    "Filter by transaction success/failure"
+    successful: Boolean
+    "Minimum fee paid in stroops"
+    minFee: Int
+    "Maximum fee paid in stroops"
+    maxFee: Int
+    "Filter by memo presence"
+    hasMemo: Boolean
+    "Filter by memo type (none, text, id, hash, return)"
+    memoType: String
+    "Filter by source account addresses (supports multiple accounts)"
+    addresses: [String!]
+  }
+
+  "Filter for operation queries"
+  input OperationFilterInput {
+    "Filter by operation type (e.g., 'payment', 'create_account')"
+    type: String
+    "Filter by parent transaction success/failure"
+    successful: Boolean
+    "Filter by source account address"
+    sourceAccount: String
+  }
+
+  "Root query type for all read operations"
+  type Query {
+    "Retrieve a paginated list of ledgers"
+    ledgers(
+      "Pagination options"
+      pagination: PaginationInput
+      "Time range to filter by"
+      timeRange: TimeRangeInput
+    ): Connection<Ledger>!
+
+    "Retrieve a single ledger by sequence number"
+    ledger("Ledger sequence number" sequence: Int!): Ledger
+
+    "Retrieve a paginated list of transactions"
+    transactions(
+      "Pagination options"
+      pagination: PaginationInput
+      "Time range to filter by"
+      timeRange: TimeRangeInput
+      "Transaction filters"
+      filter: TransactionFilterInput
+    ): Connection<Transaction>!
+
+    "Retrieve a single transaction by hash"
+    transaction("Transaction hash (hex)" hash: String!): Transaction
+
+    "Retrieve a paginated list of operations"
+    operations(
+      "Pagination options"
+      pagination: PaginationInput
+      "Time range to filter by"
+      timeRange: TimeRangeInput
+      "Operation filters"
+      filter: OperationFilterInput
+    ): Connection[Operation]!
+
+    "Retrieve a single operation by ID"
+    operation("Operation ID" id: String!): Operation
+
+    "Retrieve a paginated list of accounts"
+    accounts(
+      "Pagination options"
+      pagination: PaginationInput
+      "Account filters"
+      filter: AccountFilterInput
+    ): Connection[Account]!
+
+    "Retrieve a single account by address"
+    account("Stellar account address" accountId: String!): Account
+
+    "Retrieve a paginated list of assets"
+    assets(
+      "Pagination options"
+      pagination: PaginationInput
+      "Asset filters"
+      filter: AssetFilterInput
+    ): Connection[Asset]!
+
+    "Retrieve a single asset"
+    asset(
+      "Asset type (native, credit_alphanum4, credit_alphanum12)"
+      assetType: String!
+      "Asset code (required for non-native)"
+      assetCode: String
+      "Asset issuer address (required for non-native)"
+      assetIssuer: String
+    ): Asset
+
+    "Retrieve time-series network metrics"
+    networkMetrics(
+      "Time range to filter by"
+      timeRange: TimeRangeInput
+    ): [NetworkMetrics!]!
+
+    "Aggregated totals across the same time range as networkMetrics (issue #220)."
+    networkMetricsSummary(timeRange: TimeRangeInput): NetworkMetricsSummary!
+
+    assetMetrics(
+      "Pagination options"
+      pagination: PaginationInput
+      "Asset filters"
+      filter: AssetFilterInput
+      "Time range to filter by"
+      timeRange: TimeRangeInput
+    ): [AssetMetrics!]!
+
+    "Retrieve activity metrics for a specific account"
+    accountMetrics(
+      "Stellar account address"
+      accountId: String!
+      "Time range to filter by"
+      timeRange: TimeRangeInput
+      orderBy: [OrderByInput!]
+    ): AccountMetricsConnection!
+
+    "Retrieve cohort analysis grouping accounts by activity patterns over the last 30 days"
+    accountCohorts(
+      "Number of cohorts to return (default: 4)"
+      limit: Int
+      "Observation window in days (default: 30)"
+      days: Int
+    ): [AccountCohort!]!
+
+    "Retrieve aggregated network statistics summary"
+    stats: NetworkStats!
+
+    "Retrieve status of system services (API, indexer, and data source)"
+    serviceStatus: ServiceStatus!
+
+    # Bulk data export (REST-style query for CSV/JSON export)
+    exportData(
+      entityType: String!
+      filter: TransactionFilterInput
+      timeRange: TimeRangeInput
+      format: String = "json"
+    ): String
+  }
+
+  "Status indicators for various system services"
+  type ServiceStatus {
+    "Status of the API server ('healthy' or 'unhealthy')"
+    api: String!
+    "Status of the indexer ('healthy', 'stalled', or 'unhealthy')"
+    indexer: String!
+    "Status of the Horizon data source ('healthy' or 'unhealthy')"
+    dataSource: String!
+  }
+
+  "Aggregated network statistics snapshot"
+  type NetworkStats {
+    "Total number of ledgers indexed"
+    totalLedgers: Int!
+    "Total number of transactions indexed"
+    totalTransactions: Int!
+    "Total number of operations indexed"
+    totalOperations: Int!
+    "Total number of unique accounts"
+    totalAccounts: Int!
+    "Total number of unique assets"
+    totalAssets: Int!
+    "Number of unique active accounts in the last 24 hours"
+    activeAccounts24h: Int!
+    "Number of unique active accounts in the last 7 days"
+    activeAccounts7d: Int!
+    "Number of unique active accounts in the last 30 days"
+    activeAccounts30d: Int!
+    "Total payment volume in the last 24 hours"
+    volume24h: String!
+    "Total payment volume in the last 7 days"
+    volume7d: String!
+    "Total payment volume in the last 30 days"
+    volume30d: String!
+    "Average transaction fee in the last 24 hours"
+    averageFee24h: Float!
+    "Transaction success rate in the last 24 hours (percentage)"
+    successRate24h: Float!
+    "Latest ledger sequence number"
+    latestLedger: Int!
+    "Close time of the latest ledger"
+    latestLedgerTime: DateTime!
+  }
+
+  "Authenticated user information"
+  type User {
+    "Unique user ID"
+    id: ID!
+    "User email address"
+    email: String!
+    "User display name"
+    name: String!
+    "User role (admin, editor, viewer)"
+    role: String!
+    "Account creation timestamp"
+    createdAt: DateTime!
+  }
+
+  "Authentication result containing user and JWT token"
+  type AuthPayload {
+    "The authenticated user"
+    user: User!
+    "JWT access token for authenticated requests"
+    token: String!
+  }
+
+  "API key generation result"
+  type ApiKeyPayload {
+    "The generated API key"
+    apiKey: String!
+    "The user this key belongs to"
+    user: User!
+  }
+
+  "Registration input"
+  input RegisterInput {
+    "User email address"
+    email: String!
+    "Account password (min 8 characters)"
+    password: String!
+    "Display name"
+    name: String!
+  }
+
+  "Login input"
+  input LoginInput {
+    "Registered email address"
+    email: String!
+    "Account password"
+    password: String!
+  }
+
+  "Root mutation type for all write operations"
+  type Mutation {
+    "Register a new user account"
+    register("Registration details" input: RegisterInput!): AuthPayload!
+    "Authenticate and receive a JWT token"
+    login("Login credentials" input: LoginInput!): AuthPayload!
+    "Generate a new API key for programmatic access"
+    generateApiKey: ApiKeyPayload!
+    "Revoke the current API key"
+    revokeApiKey: Boolean!
+  }
+
+  "Root subscription type for real-time updates via WebSocket"
+  type Subscription {
+    "Subscribe to new ledgers as they are added"
+    ledgerAdded: Ledger!
+    "Subscribe to new transactions as they are confirmed"
+    transactionAdded: Transaction!
+    "Subscribe to new operations as they are applied"
+    operationAdded: Operation!
+    "Subscribe to periodic network metrics updates"
+    networkMetricsUpdated: NetworkMetrics!
+
+    "Subscribe to transactions for a specific account"
+    transactionsForAccount("Stellar account address to monitor" accountId: String!): Transaction!
+    "Subscribe to operations from a specific account"
+    operationsForAccount("Stellar account address to monitor" accountId: String!): Operation!
+    "Subscribe to operations of a specific type"
+    operationsForType("Operation type to filter by" type: String!): Operation!
+  }"
+`;

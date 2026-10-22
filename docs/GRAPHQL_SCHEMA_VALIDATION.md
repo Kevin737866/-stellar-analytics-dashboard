@@ -142,17 +142,12 @@ pnpm test --coverage
 - [API Examples](./api-examples.md)
 - [CI Operational Notes](./CI_OPERATIONAL_NOTES.md)
 
-## Generated Schema Documentation
+## Schema Snapshot Check
 
-Reference docs are generated from the active API schema (`api/src/schema.ts`):
+`packages/api/src/schema/typeDefs.snapshot.test.ts` compares the API schema SDL with the committed Jest snapshot in `packages/api/src/schema/__snapshots__/`. Any schema change fails `pnpm --filter @stellar-analytics/api test` until the snapshot is updated on purpose:
 
 ```bash
-pnpm docs:graphql
+pnpm --filter @stellar-analytics/api test -- -u src/schema/typeDefs.snapshot.test.ts
 ```
 
-This writes:
-
-- `docs/generated/schema.graphql`: the printed SDL
-- `docs/generated/graphql-schema.md`: a Markdown reference of every type, field, argument, and enum value
-
-Re-run the command and commit the output whenever `api/src/schema.ts` changes.
+Review the snapshot diff in the PR. Removed or renamed fields are breaking changes (see `docs/api-versioning.md`).
