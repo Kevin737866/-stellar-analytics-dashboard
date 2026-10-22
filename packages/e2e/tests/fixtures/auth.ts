@@ -1,5 +1,7 @@
-import { test as base, expect } from '@playwright/test';
 import { Page } from '@playwright/test';
+// Extends the browser failure-metadata fixture so every authenticated test
+// automatically attaches environment details when it fails (issue #456).
+import { test as base, expect } from './failure-metadata';
 
 /**
  * Fixture for authenticated user context
