@@ -1,4 +1,5 @@
-import { test, expect, devices } from '@playwright/test';
+import { devices } from '@playwright/test';
+import { test, expect } from './fixtures/failure-metadata';
 import { clearAuth } from './fixtures/auth';
 
 // Test on mobile viewport

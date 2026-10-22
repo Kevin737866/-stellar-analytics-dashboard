@@ -11,6 +11,7 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import winston from 'winston';
 import depthLimit from 'graphql-depth-limit';
+import { resolveMaxQueryDepth } from './utils/graphql-depth';
 
 import { typeDefs } from './schema/typeDefs';
 import { resolvers } from './resolvers';

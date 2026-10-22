@@ -38,7 +38,20 @@ this.apolloServer = new ApolloServer({
 });
 ```
 
-The maximum allowed depth is **10 levels**.
+The maximum allowed depth defaults to **10 levels** and is configurable through the `GRAPHQL_MAX_DEPTH` environment variable (`packages/api/src/utils/graphql-depth.ts`):
+
+```ts
+validationRules: [depthLimit(resolveMaxQueryDepth()) as any],
+```
+
+| `GRAPHQL_MAX_DEPTH` value | Effective depth |
+| --- | --- |
+| unset / empty | `10` (default) |
+| integer `1`–`50` | the configured value |
+| `< 1` or `> 50` | clamped to `1` or `50` |
+| non-integer (e.g. `abc`, `4.5`) | `10` (default) |
+
+**Operational notes:** the value is read once at server startup, so restart the API to apply a change. Lowering it can reject client queries that worked before, so check the frontend's deepest queries before reducing it in production.
 
 ### What Counts as Depth
 

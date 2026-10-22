@@ -71,7 +71,8 @@ packages/e2e/
 │   ├── details.spec.ts           # Detail page tests
 │   ├── responsive.spec.ts        # Responsive design tests
 │   ├── performance.spec.ts       # Performance tests
-│   └── visual-regression.spec.ts # Visual regression tests
+│   ├── visual-regression.spec.ts # Visual regression tests
+│   └── failure-metadata.spec.ts  # Browser failure metadata tests
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -79,8 +80,8 @@ packages/e2e/
 
 ## Test Coverage
 
-<!-- e2e-test-count: 68 -->
-<!-- e2e-suite-count: 8 -->
+<!-- e2e-test-count: 71 -->
+<!-- e2e-suite-count: 9 -->
 
 ### Test inventory
 
@@ -94,7 +95,8 @@ packages/e2e/
 | `responsive.spec.ts` | 7 |
 | `performance.spec.ts` | 6 |
 | `visual-regression.spec.ts` | 20 |
-| **Total** | **68** |
+| `failure-metadata.spec.ts` | 3 |
+| **Total** | **71** |
 
 The counts above are verified by `indexer/src/__tests__/e2e-test-counts.test.ts`. Update this table whenever you add or remove Playwright tests.
 
@@ -277,6 +279,37 @@ open packages/e2e/playwright-report/index.html
 - HTML reports in artifacts
 - GitHub PR comments with summary
 - GitHub Checks integration
+
+### Browser failure metadata
+
+When a test fails, the automatic `failure-metadata` fixture attaches a
+`browser-failure-metadata.json` file to that attempt. It records the browser
+engine and version, project/device, viewport and user agent, locale, colour
+scheme, base URL, Playwright/Node versions, test location and retry index, the
+GitHub Actions run identifiers, and the failure message. The HTML report shows
+it under *Attachments*, and it is uploaded with the existing `test-results/`
+artifacts.
+
+Specs opt in by importing the extended fixture:
+
+```typescript
+import { test, expect } from './fixtures/failure-metadata';
+```
+
+`./fixtures/auth` already extends it, so authenticated suites get metadata
+without changes. Smoke tests that only use `request` intentionally do not —
+they target deployed environments rather than a browser. See
+[`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md#browser-failure-metadata) for how
+to read the payload.
+
+### Visual baseline retention
+
+Visual-regression baselines are committed to git and kept for the lifetime of
+their test, while CI artefacts expire. The full policy — paths, retention
+windows, update rules, orphan checks and review cadence — lives in
+[`VISUAL_BASELINES.md`](./VISUAL_BASELINES.md). Run
+`pnpm --filter @stellar-analytics/e2e check:baselines` to verify that no
+committed baseline has lost its test.
 
 ## Debugging Tests
 

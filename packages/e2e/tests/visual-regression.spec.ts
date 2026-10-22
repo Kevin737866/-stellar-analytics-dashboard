@@ -19,12 +19,16 @@
  *   pnpm test:e2e:visual             (compares against existing baselines)
  *
  * Each toHaveScreenshot() call writes a .png under:
- *   packages/e2e/tests/__snapshots__/visual-regression.spec.ts-snapshots/
+ *   packages/e2e/tests/__snapshots__/visual-regression.spec.ts/visual-regression/
  *
  * The snapshot directory is committed to git so CI always has a reference.
+ *
+ * Retention of committed baselines vs. CI artefacts is documented in
+ * ./VISUAL_BASELINES.md — update it when snapshot paths or CI retention change.
  */
 
-import { test, expect, Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { test, expect } from './fixtures/failure-metadata';
 
 // ---------------------------------------------------------------------------
 // Helpers
