@@ -2,7 +2,18 @@ import { createServer } from "node:http";
 import express from "express";
 import cors from "cors";
 import compression from "compression";
-import { buildSchema, graphql, execute, subscribe } from "graphql";
+import {
+  buildSchema,
+  execute,
+  parse,
+  specifiedRules,
+  subscribe,
+  validate,
+  type DocumentNode,
+  type ExecutionResult,
+  type GraphQLError,
+  type GraphQLSchema,
+} from "graphql";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/use/ws";
 import { typeDefs } from "./schema.js";
@@ -11,6 +22,15 @@ import { createLoaders } from "./loaders.js";
 import { pool } from "./db.js";
 import { pubsub } from "./pubsub.js";
 import { startLedgerEventListener } from "./pg-listener.js";
+import { depthLimit } from "./depthLimit.js";
+import { getClientIp } from "./clientIp.js";
+import {
+  MemoryRateLimitStore,
+  PostgresRateLimitStore,
+  checkRateLimit,
+  rateLimitHeaders,
+  type RateLimitStore,
+} from "./rateLimit.js";
 
 const app = express();
 app.use(cors());
@@ -32,30 +52,45 @@ if (subscriptionType) {
   ledgerAddedField.resolve = (payload) => payload;
 }
 
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_WINDOW = 60 * 1000;
-const RATE_LIMIT_MAX = 100;
+const validationRules = [...specifiedRules, depthLimit()];
 
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const record = rateLimitStore.get(ip);
-  if (!record || now > record.resetAt) {
-    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
-    return true;
-  }
-  if (record.count >= RATE_LIMIT_MAX) {
-    return false;
-  }
-  record.count++;
-  return true;
+function validateWithLimits(schema: GraphQLSchema, document: DocumentNode) {
+  return validate(schema, document, validationRules);
 }
 
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, val] of rateLimitStore) {
-    if (now > val.resetAt) rateLimitStore.delete(key);
+async function runQuery(
+  source: string,
+  variableValues?: Record<string, unknown>,
+): Promise<ExecutionResult> {
+  let document: DocumentNode;
+  try {
+    document = parse(source);
+  } catch (err) {
+    return { errors: [err as GraphQLError] };
   }
-}, 60000);
+  const errors = validateWithLimits(schema, document);
+  if (errors.length > 0) return { errors };
+  return execute({
+    schema,
+    document,
+    rootValue: resolvers,
+    contextValue: { loaders: createLoaders() },
+    variableValues,
+  }) as Promise<ExecutionResult>;
+}
+
+// Issue #420: RATE_LIMIT_STORE=postgres shares counters across replicas;
+// the in-memory store remains the default and the fallback on DB errors.
+const memoryRateLimitStore = new MemoryRateLimitStore();
+const sharedRateLimitStore: RateLimitStore | null =
+  process.env.RATE_LIMIT_STORE === "postgres" ? new PostgresRateLimitStore(pool) : null;
+
+setInterval(() => {
+  memoryRateLimitStore.prune();
+  if (sharedRateLimitStore instanceof PostgresRateLimitStore) {
+    sharedRateLimitStore.prune().catch((err) => console.error("[api] rate limit prune failed", err));
+  }
+}, 60000).unref();
 
 const playgroundHtml = `
 <!doctype html>
@@ -129,9 +164,17 @@ const playgroundHtml = `
 </html>
 `;
 
-app.use("/graphql", (req, res, next) => {
-  const ip = req.ip || req.socket.remoteAddress || "unknown";
-  if (!checkRateLimit(ip)) {
+app.use("/graphql", async (req, res, next) => {
+  const ip = getClientIp(req.headers["x-forwarded-for"], req.socket.remoteAddress);
+  let result;
+  try {
+    result = await checkRateLimit(sharedRateLimitStore ?? memoryRateLimitStore, ip);
+  } catch (err) {
+    console.error("[api] shared rate limit store unavailable, using memory store", err);
+    result = await checkRateLimit(memoryRateLimitStore, ip);
+  }
+  res.set(rateLimitHeaders(result));
+  if (!result.allowed) {
     res.status(429).json({ error: "Too many requests from this IP, please try again later." });
     return;
   }
@@ -149,13 +192,7 @@ app.get("/graphql", async (req, res) => {
     return;
   }
 
-  const loaders = createLoaders();
-  const result = await graphql({ 
-    schema, 
-    source: query, 
-    rootValue: resolvers,
-    contextValue: { loaders }
-  });
+  const result = await runQuery(query);
   res.status(200).json(result);
 });
 
@@ -164,14 +201,7 @@ app.post("/graphql", async (req, res) => {
   const variables =
     typeof req.body?.variables === "object" && req.body.variables ? req.body.variables : undefined;
 
-  const loaders = createLoaders();
-  const result = await graphql({
-    schema,
-    source: query,
-    rootValue: resolvers,
-    contextValue: { loaders },
-    variableValues: variables
-  });
+  const result = await runQuery(query, variables);
   res.status(200).json(result);
 });
 
@@ -185,7 +215,7 @@ const wsServer = new WebSocketServer({
   server: httpServer,
   path: "/graphql",
 });
-useServer({ schema, execute, subscribe }, wsServer);
+useServer({ schema, execute, subscribe, validate: validateWithLimits }, wsServer);
 
 const connectionString =
   process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:5432/stellar_analytics";

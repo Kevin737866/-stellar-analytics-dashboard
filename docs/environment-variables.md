@@ -92,6 +92,14 @@ See also: `docs/performance-alerting.md`, `docs/backup-disaster-recovery.md`
 
 ---
 
+## Root API (`api/`)
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `GRAPHQL_MAX_DEPTH` | No | `10` | Maximum GraphQL operation depth |
+| `RATE_LIMIT_STORE` | No | `memory` | `postgres` shares rate-limit counters across replicas |
+| `TRUST_PROXY_HOPS` | No | `0` | Trusted reverse proxies; `0` ignores `X-Forwarded-For` |
+
 ## Frontend (`frontend/.env.local`)
 
 | Variable | Required | Default | Description |

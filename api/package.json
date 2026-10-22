@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/index.ts",
-    "docs:graphql": "tsx scripts/generate-graphql-docs.ts",
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "test": "tsx --test src/__tests__/*.test.ts"
   },
   "dependencies": {
     "@stellar-analytics/shared": "workspace:*",
