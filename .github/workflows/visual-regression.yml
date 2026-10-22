@@ -79,6 +79,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Fails when a committed baseline no longer belongs to a test, keeping
+      # the snapshot set in sync with visual-regression.spec.ts (issue #454).
+      - name: Check visual baseline inventory
+        run: pnpm --filter @stellar-analytics/e2e check:baselines
+
       - name: Install Playwright Chromium only
         run: pnpm --filter @stellar-analytics/e2e exec playwright install chromium --with-deps
 

@@ -245,6 +245,59 @@ PLAYWRIGHT_DISABLE_TRACE=1 pnpm test:e2e
 PLAYWRIGHT_DISABLE_SCREENSHOT=1 pnpm test:e2e
 ```
 
+## Browser Failure Metadata
+
+Every failed attempt automatically attaches a `browser-failure-metadata.json`
+file to the test result (issue #456). It is the fastest way to answer "which
+browser was this?" before digging through traces.
+
+Where to find it:
+
+- **HTML report** — open the failed test and use the *Attachments* tab.
+- **On disk** — `packages/e2e/test-results/<test-id>/browser-failure-metadata.json`
+  (next to the screenshot, video and trace).
+- **CI** — download the `e2e-test-results` or `visual-regression-results`
+  artifact; it contains the whole `test-results/` directory.
+
+The CI log also prints one summary line:
+
+```text
+[failure-metadata] browser-failure-metadata: firefox 141.0 project=firefox viewport=1280x720 retry=1 url=http://localhost:5173/ ci=github-actions (run 123#2)
+```
+
+Fields worth reading first:
+
+| Field | Use it to |
+| --- | --- |
+| `browser.name` / `browser.version` | Reproduce with the exact build (`pnpm exec playwright install <name>`). |
+| `test.project` | Re-run only that project: `pnpm --filter @stellar-analytics/e2e test --project="<project>"`. |
+| `test.retry` | Distinguish the first failure from a retry (retries re-record metadata each attempt). |
+| `environment.viewport` / `deviceScaleFactor` / `isMobile` | Catch layout assertions that depend on the emulated device. |
+| `environment.userAgent` / `locale` / `timezoneId` / `colorScheme` | Catch rendering and formatting differences. |
+| `ci.runId` / `ci.sha` / `ci.job` | Jump straight to the failing GitHub Actions job. |
+| `failure.message` / `failure.stack` | Read the assertion without opening the trace. |
+
+If the metadata is missing for a failure, the page fixture itself likely threw
+during setup — check the setup error first.
+
+## Visual Regression Baseline Mismatches
+
+A pixel diff means the rendered UI changed, not that the baseline is wrong.
+
+```bash
+# Compare against committed baselines (same mode CI uses)
+pnpm --filter @stellar-analytics/e2e test:visual
+
+# Inspect expected/actual/diff PNGs
+ls packages/e2e/test-results/**/*-diff.png
+```
+
+Download the `visual-regression-diffs` artifact when triaging CI failures.
+Only run `test:visual:update` once you have explained the change, and commit
+the regenerated baselines in the PR that caused them. Retention of committed
+baselines versus CI artifacts — and the orphan-baseline check — is documented
+in [`VISUAL_BASELINES.md`](./VISUAL_BASELINES.md).
+
 ## Browser-Specific Issues
 
 ### Chrome Tests Fail

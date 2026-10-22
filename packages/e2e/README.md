@@ -73,14 +73,18 @@ test.describe('Feature Name', () => {
 | `tests/responsive.spec.ts` | Mobile/tablet tests |
 | `tests/performance.spec.ts` | Performance tests |
 | `tests/visual-regression.spec.ts` | Visual regression tests |
+| `tests/failure-metadata.spec.ts` | Browser failure metadata tests |
+| `tests/fixtures/failure-metadata.ts` | Attaches browser context to failed tests |
+| `VISUAL_BASELINES.md` | Visual baseline retention policy |
 
-**68 Playwright tests** across 8 spec files — see the [test inventory](./E2E_TESTING_GUIDE.md#test-inventory) in `E2E_TESTING_GUIDE.md`.
+**71 Playwright tests** across 9 spec files — see the [test inventory](./E2E_TESTING_GUIDE.md#test-inventory) in `E2E_TESTING_GUIDE.md`.
 
 ## Test Capabilities
 
 ✅ **Cross-browser**: Chrome, Firefox, Safari
 ✅ **Mobile testing**: iPhone, Android emulation
-✅ **Visual testing**: Screenshots on failure
+✅ **Visual testing**: Screenshots on failure, committed baselines
+✅ **Failure metadata**: Browser/CI context attached to every failed test
 ✅ **Network monitoring**: GraphQL queries
 ✅ **Authentication**: Automatic login fixture
 ✅ **Performance**: Page load timing

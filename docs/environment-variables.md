@@ -55,6 +55,9 @@ See also: `indexer/ALERTING.md`, `indexer/BACKFILL.md`
 | `REDIS_URL` | Yes | — | Redis connection string |
 | `PORT` | No | `4000` | HTTP server port |
 | `NODE_ENV` | No | `development` | Runtime environment |
+| `API_BODY_LIMIT` | No | `100kb` | Maximum `/graphql` request body size; larger bodies get `413 Payload too large` |
+| `API_REQUEST_TIMEOUT_MS` | No | `30000` | Per-request HTTP timeout; slow requests get `503 Request timeout` and the Node server's `requestTimeout` is set to match |
+| `ALLOW_INTROSPECTION` | No | — | GraphQL introspection override. Unset: enabled outside production, disabled when `NODE_ENV=production`. `true`/`false` forces it on/off |
 | `CORS_ORIGIN` | No | `*` | Allowed CORS origin(s) |
 | `JWT_SECRET` | Yes (prod) | dev default | JWT signing secret (min 32 chars) |
 | `LOG_LEVEL` | No | `info` | Minimum log level |
@@ -71,6 +74,7 @@ See also: `indexer/ALERTING.md`, `indexer/BACKFILL.md`
 | `RATE_LIMIT_JWT_USER_MAX` | No | `1000` | JWT user requests per window |
 | `RATE_LIMIT_ANON_WINDOW_MS` | No | `60000` | Anonymous rate-limit window |
 | `RATE_LIMIT_ANON_MAX` | No | `100` | Anonymous requests per window |
+| `GRAPHQL_MAX_DEPTH` | No | `10` | Max GraphQL query depth (`packages/api`); integer clamped to 1–50, invalid values fall back to 10 |
 | `PERF_ALERTING_ENABLED` | No | `false` | Enable API performance alerting |
 | `PERF_SLOW_GRAPHQL_WARN_MS` | No | `1000` | GraphQL slow-query warn threshold |
 | `PERF_SLOW_GRAPHQL_CRITICAL_MS` | No | `5000` | GraphQL slow-query critical threshold |
