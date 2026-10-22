@@ -16,6 +16,16 @@ pool.on("error", (err) => {
   process.exit(-1);
 });
 
+/** Snapshot of connection pool usage for operational monitoring. */
+export function getPoolMetrics() {
+  return {
+    totalCount: pool.totalCount,
+    idleCount: pool.idleCount,
+    waitingCount: pool.waitingCount,
+    max: pool.options.max,
+  };
+}
+
 export async function query(text: string, params?: any[]) {
   const start = Date.now();
   const res = await pool.query(text, params);

@@ -44,7 +44,7 @@ export interface HorizonServerLike {
  *  - If `STELLAR_MOCK=true` env var is set, use the built-in mock server.
  *  - Otherwise create a real Horizon.Server for the given network.
  */
-async function resolveServer(
+export async function resolveServer(
   network: StellarNetwork,
   serverOverride?: HorizonServerLike
 ): Promise<HorizonServerLike> {

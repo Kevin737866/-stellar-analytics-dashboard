@@ -19,7 +19,7 @@ import { useServer } from "graphql-ws/use/ws";
 import { typeDefs } from "./schema.js";
 import { resolvers } from "./resolvers/index.js";
 import { createLoaders } from "./loaders.js";
-import { pool } from "./db.js";
+import { pool, getPoolMetrics } from "./db.js";
 import { pubsub } from "./pubsub.js";
 import { startLedgerEventListener } from "./pg-listener.js";
 import { depthLimit } from "./depthLimit.js";
@@ -179,6 +179,10 @@ app.use("/graphql", async (req, res, next) => {
     return;
   }
   next();
+});
+
+app.get("/metrics/db-pool", (_req, res) => {
+  res.json(getPoolMetrics());
 });
 
 app.get("/graphql", async (req, res) => {

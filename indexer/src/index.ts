@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import http from 'http';
 import { Pool } from 'pg';
-import { Horizon } from '@stellar/stellar-sdk';
-import { STELLAR_NETWORKS, type StellarNetwork } from '@stellar-analytics/shared';
-import { pollLatestLedger } from './ingester.js';
+import { type StellarNetwork } from '@stellar-analytics/shared';
+import { pollLatestLedger, resolveServer } from './ingester.js';
+import { shouldEmitAlert } from './alert-cooldown.js';
 import {
   normalizeLedger,
   normalizeTransactions,
@@ -88,8 +88,7 @@ async function checkDatabaseHealth(): Promise<{
     const now = new Date();
     if (
       alertService &&
-      state.lastDatabaseErrorAlertAt &&
-      now.getTime() - state.lastDatabaseErrorAlertAt.getTime() > 5 * 60 * 1000 // 5 minute cooldown
+      shouldEmitAlert(state.lastDatabaseErrorAlertAt, now, 5 * 60 * 1000) // 5 minute cooldown
     ) {
       await alertService.alertDatabaseError(err, 'health check failed');
       state.lastDatabaseErrorAlertAt = now;
@@ -104,10 +103,10 @@ async function checkHorizonHealth(): Promise<{
   latencyMs?: number;
   error?: string;
 }> {
-  const horizonConfig = STELLAR_NETWORKS[network];
-  const server = new Horizon.Server(horizonConfig.horizonUrl);
   const start = Date.now();
   try {
+    // Honors STELLAR_MOCK=true so health checks use the mock server (issue #430)
+    const server = await resolveServer(network);
     const ledgers = await server.ledgers().order('desc').limit(1).call();
     const seq: number = ledgers.records[0]?.sequence ?? 0;
     state.latestHorizonLedger = seq;
@@ -118,8 +117,7 @@ async function checkHorizonHealth(): Promise<{
     const now = new Date();
     if (
       alertService &&
-      state.lastHorizonErrorAlertAt &&
-      now.getTime() - state.lastHorizonErrorAlertAt.getTime() > 5 * 60 * 1000 // 5 minute cooldown
+      shouldEmitAlert(state.lastHorizonErrorAlertAt, now, 5 * 60 * 1000) // 5 minute cooldown
     ) {
       await alertService.alertCircuitBreakerOpen('Horizon API', err?.message ?? String(err));
       state.lastHorizonErrorAlertAt = now;

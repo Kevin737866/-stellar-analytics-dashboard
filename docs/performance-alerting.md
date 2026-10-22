@@ -207,3 +207,16 @@ pnpm --filter @stellar-analytics/api test -- --testPathPattern=performance-alert
 - [Error Handling and Logging](./error-handling-and-logging.md)
 - [Query Performance](./query-performance.md)
 - Indexer alerting: `packages/indexer/src/alerting/` and `indexer/ALERTING.md`
+
+## API Database Pool Metrics
+
+The API exposes `GET /metrics/db-pool`, returning a JSON snapshot of the PostgreSQL connection pool:
+
+| Field | Meaning |
+| --- | --- |
+| `totalCount` | Open connections (idle + in use) |
+| `idleCount` | Connections available for reuse |
+| `waitingCount` | Queries queued waiting for a connection |
+| `max` | Configured pool size |
+
+A sustained non-zero `waitingCount` or `totalCount` near `max` indicates pool exhaustion; scale the pool or investigate slow queries.

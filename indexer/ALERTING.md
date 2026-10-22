@@ -141,6 +141,10 @@ To prevent alert spam, each alert type has a cooldown period after being sent. T
   - `SLACK_ALERT_COOLDOWN_MS`
   - `EMAIL_ALERT_COOLDOWN_MS`
 
+The first database or Horizon health-check failure always emits an alert immediately; the cooldown only applies to subsequent failures and resets after a successful check.
+
+Health checks honor `STELLAR_MOCK=true` and probe the built-in mock Horizon server instead of the live network.
+
 ## Integration Points
 
 ### In Code
