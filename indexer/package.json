@@ -38,14 +38,14 @@
     "pino-pretty": "^11.3.0",
     "pino-roll": "^1.0.0",
     "prom-client": "^15.1.2",
-    "ws": "^8.20.0"
+    "ws": "^8.22.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/pg": "^8.20.0",
     "@types/pino": "^7.0.5",
-    "@types/ws": "^8.18.1",
+    "@types/ws": "^8.18.2",
     "jest": "^30.3.0",
     "ts-jest": "^29.4.6",
     "tsx": "^4.20.6",
