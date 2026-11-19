@@ -63,7 +63,9 @@ packages/e2e/
 ├── playwright.config.ts           # Playwright configuration
 ├── tests/
 │   ├── fixtures/
-│   │   └── auth.ts               # Authentication fixtures & helpers
+│   │   ├── auth.ts               # Authentication fixtures & helpers
+│   │   ├── failure-metadata.ts   # Browser context attached to failed tests
+│   │   └── network-timeout.ts    # GraphQL timeout simulator
 │   ├── auth.spec.ts              # Authentication flow tests
 │   ├── dashboard.spec.ts         # Dashboard navigation tests
 │   ├── data-visualization.spec.ts # Data visualization tests
@@ -72,7 +74,8 @@ packages/e2e/
 │   ├── responsive.spec.ts        # Responsive design tests
 │   ├── performance.spec.ts       # Performance tests
 │   ├── visual-regression.spec.ts # Visual regression tests
-│   └── failure-metadata.spec.ts  # Browser failure metadata tests
+│   ├── failure-metadata.spec.ts  # Browser failure metadata tests
+│   └── api-timeout-recovery.spec.ts # API timeout recovery tests
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -80,8 +83,8 @@ packages/e2e/
 
 ## Test Coverage
 
-<!-- e2e-test-count: 71 -->
-<!-- e2e-suite-count: 9 -->
+<!-- e2e-test-count: 74 -->
+<!-- e2e-suite-count: 10 -->
 
 ### Test inventory
 
@@ -96,7 +99,8 @@ packages/e2e/
 | `performance.spec.ts` | 6 |
 | `visual-regression.spec.ts` | 20 |
 | `failure-metadata.spec.ts` | 3 |
-| **Total** | **71** |
+| `api-timeout-recovery.spec.ts` | 3 |
+| **Total** | **74** |
 
 The counts above are verified by `indexer/src/__tests__/e2e-test-counts.test.ts`. Update this table whenever you add or remove Playwright tests.
 
@@ -301,6 +305,29 @@ without changes. Smoke tests that only use `request` intentionally do not —
 they target deployed environments rather than a browser. See
 [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md#browser-failure-metadata) for how
 to read the payload.
+
+### API timeout recovery
+
+`api-timeout-recovery.spec.ts` covers how the dashboard behaves when the
+GraphQL API stops responding. Requests are failed at the transport layer with
+`fixtures/network-timeout.ts`, which is what a timeout looks like to Apollo;
+no real infrastructure is slowed down.
+
+| Scenario | Expected behaviour |
+|----------|--------------------|
+| One transient timeout | Apollo's `RetryLink` retries and the dashboard renders real data, with no warning shown |
+| Sustained timeout | The first page load still completes: fallback metrics render and a *Could not refresh data* warning with a **Retry** button is shown |
+| API recovers, user retries | Clicking **Retry** in the warning refreshes the data and the warning disappears |
+
+```bash
+# Run just the timeout scenarios
+pnpm --filter @stellar-analytics/e2e exec playwright test api-timeout-recovery
+```
+
+The simulator is deliberately limited to the HTTP endpoint
+(`/graphql`); WebSocket subscriptions are not affected. Install it **after**
+the `authenticatedPage` fixture has logged in, otherwise the login mutation is
+intercepted as well.
 
 ### Visual baseline retention
 
