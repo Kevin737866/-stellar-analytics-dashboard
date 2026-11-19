@@ -75,9 +75,11 @@ test.describe('Feature Name', () => {
 | `tests/visual-regression.spec.ts` | Visual regression tests |
 | `tests/failure-metadata.spec.ts` | Browser failure metadata tests |
 | `tests/fixtures/failure-metadata.ts` | Attaches browser context to failed tests |
+| `tests/api-timeout-recovery.spec.ts` | API timeout recovery tests |
+| `tests/fixtures/network-timeout.ts` | Simulates GraphQL timeouts in the browser |
 | `VISUAL_BASELINES.md` | Visual baseline retention policy |
 
-**71 Playwright tests** across 9 spec files — see the [test inventory](./E2E_TESTING_GUIDE.md#test-inventory) in `E2E_TESTING_GUIDE.md`.
+**74 Playwright tests** across 10 spec files — see the [test inventory](./E2E_TESTING_GUIDE.md#test-inventory) in `E2E_TESTING_GUIDE.md`.
 
 ## Test Capabilities
 
@@ -86,6 +88,7 @@ test.describe('Feature Name', () => {
 ✅ **Visual testing**: Screenshots on failure, committed baselines
 ✅ **Failure metadata**: Browser/CI context attached to every failed test
 ✅ **Network monitoring**: GraphQL queries
+✅ **Failure recovery**: API timeout and retry handling
 ✅ **Authentication**: Automatic login fixture
 ✅ **Performance**: Page load timing
 ✅ **Responsive design**: Multiple viewports
